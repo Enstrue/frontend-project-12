@@ -1,5 +1,4 @@
 build:
-	cd frontend && npm run build
-
-start:
-	npx chat-server -s ./frontend/dist
+	npm run build
+start-backend:
+	npx start-server
