@@ -1,4 +1,4 @@
 build:
-	npm run build --prefix ./frontend
+  cd ./frontend && npm install && npm run build
 start-backend:
 	npx start-server
