@@ -1,62 +1,49 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { Form, Button, Alert } from "react-bootstrap";
+import { useState } from 'react';
+import axios from 'axios';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      const { data } = await axios.post("http://localhost:5001/login", {
-        username,
-        password,
+      const response = await axios.post('/api/v1/login', {
+        username: 'admin',
+        password: 'admin',
       });
-
-      const { token } = data;
-
-      localStorage.setItem("token", token);
-
-      navigate("/");  // Редирект на страницу чата
-    } catch (err) {
-      setError(err, "Ошибка авторизации. Проверьте логин и пароль.");
+  
+      console.log('Server response:', response.data);
+  
+      if (response.status === 200) {
+        localStorage.setItem('token', response.data.token);
+        window.location.href = '/';
+      }
+    } catch (error) {
+      console.error('Login error:', error.message);
+      console.error('Server response:', error.response?.data);
     }
   };
 
   return (
-    <div className="p-4">
-      <h2>Форма входа</h2>
-      {error && <Alert variant="danger">{error}</Alert>}
-      <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="username">
-          <Form.Label>Имя пользователя</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Введите имя пользователя"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </Form.Group>
-
-        <Form.Group controlId="password">
-          <Form.Label>Пароль</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Введите пароль"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Form.Group>
-
-        <Button variant="primary" type="submit" className="mt-2">
-          Войти
-        </Button>
-      </Form>
+    <div>
+      <h1>Login</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+        />
+        <button type="submit">Login</button>
+      </form>
     </div>
   );
 };
