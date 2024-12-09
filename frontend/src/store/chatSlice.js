@@ -1,17 +1,15 @@
+// chatSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import apiClient from '../api/client';
 
-// Получение данных о каналах и сообщениях
 export const fetchChatData = createAsyncThunk('chat/fetchData', async () => {
   const token = localStorage.getItem('token');
 
   try {
-    // Получение списка каналов
     const channelsResponse = await apiClient.get('/api/v1/channels', {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    // Получение сообщений
     const messagesResponse = await apiClient.get('/api/v1/messages', {
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -21,11 +19,10 @@ export const fetchChatData = createAsyncThunk('chat/fetchData', async () => {
       messages: messagesResponse.data
     };
   } catch (err) {
-    throw new Error('Failed to fetch chat data: ' + err.message);
+    throw new Error('Failed to fetch chat data', err);
   }
 });
 
-// Отправка нового сообщения
 export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ channelId, body }) => {
   const token = localStorage.getItem('token');
 
@@ -43,10 +40,10 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ channel
 const chatSlice = createSlice({
   name: 'chat',
   initialState: {
-    channels: [],   // Список каналов
-    messages: [],   // Сообщения
-    status: 'idle', // Статус запроса
-    error: null    // Ошибка при запросах
+    channels: [],
+    messages: [],
+    status: 'idle',
+    error: null
   },
   reducers: {},
 
