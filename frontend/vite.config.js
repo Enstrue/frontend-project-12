@@ -8,8 +8,6 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:5001',
-        changeOrigin: true, // Это поможет проксировать запросы через origin.
-        rewrite: (path) => path.replace(/^\/api/, '/api/v1'), // Прокси запросы перенаправляются на `/api/v1`.
       },
       '/socket.io': {
         target: 'ws://localhost:5001',
