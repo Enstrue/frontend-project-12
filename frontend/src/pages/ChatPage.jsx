@@ -10,8 +10,10 @@ import {
   renameChannel
 } from '../store/chatSlice';
 import { Modal, Button, Dropdown } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 const ChatPage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { channels, messages, status, error } = useSelector((state) => state.chat);
 
@@ -26,15 +28,13 @@ const ChatPage = () => {
     dispatch(fetchChatData()).then(() => {
       if (channels.length > 0) {
         if (isInitialRender.current) {
-          // При первом рендере выбираем канал 'general'
           setCurrentChannel(channels.find(channel => channel.name === 'general')?.id || '');
-          isInitialRender.current = false;  // После первого рендера флаг устанавливаем в false
+          isInitialRender.current = false;
         }
       }
     });
   }, [dispatch, channels]);
   
-
   const handleChannelChange = (channelId) => {
     setCurrentChannel(channelId);
   };
@@ -79,10 +79,10 @@ const ChatPage = () => {
 
   const validationSchema = Yup.object({
     name: Yup.string()
-      .min(3, 'Имя должно содержать минимум 3 символа')
-      .max(20, 'Имя должно содержать максимум 20 символов')
-      .required('Обязательно для заполнения')
-      .test('unique', 'Имя уже существует', (value) =>
+      .min(3, t('validation.usernameMin'))
+      .max(20, t('validation.usernameMax'))
+      .required(t('validation.required'))
+      .test('unique', t('validation.unique'), (value) =>
         !channels.some((channel) => channel.name === value)
       ),
   });
@@ -92,9 +92,9 @@ const ChatPage = () => {
       <div className="row">
         {/* Секция каналов */}
         <div className="col-md-4 border-end">
-          <h4>Channels</h4>
+          <h4>{t('chat.channels')}</h4>
 
-          {status === 'failed' && <p className="text-danger">{error}</p>}
+          {status === 'failed' && <p className="text-danger">{t('error')}: {error}</p>}
 
           <ul className="list-group">
             {channels.map((channel) => (
@@ -107,7 +107,7 @@ const ChatPage = () => {
                 </span>
                 <Dropdown>
                   <Dropdown.Toggle size="sm" variant="secondary">
-                    Actions
+                    {t('chat.actions')}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
                     <Dropdown.Item
@@ -116,7 +116,7 @@ const ChatPage = () => {
                         setModalType('rename');
                       }}
                     >
-                      Rename
+                      {t('chat.renameChannel')}
                     </Dropdown.Item>
                     {channel.id !== defaultChannelId && (
                       <Dropdown.Item
@@ -125,7 +125,7 @@ const ChatPage = () => {
                           setModalType('delete');
                         }}
                       >
-                        Delete
+                        {t('chat.delete')}
                       </Dropdown.Item>
                     )}
                   </Dropdown.Menu>
@@ -138,7 +138,7 @@ const ChatPage = () => {
         {/* Секция сообщений и отправки */}
         <div className="col-md-8">
           <h4>
-            Chat in {currentChannel ? `#${channels.find((ch) => ch.id === currentChannel)?.name}` : ''}
+            {t('chat.chatIn')} {currentChannel ? `#${channels.find((ch) => ch.id === currentChannel)?.name}` : ''}
           </h4>
 
           <div className="chat-box border rounded p-3 mb-3" style={{ height: '300px', overflowY: 'scroll' }}>
@@ -162,11 +162,11 @@ const ChatPage = () => {
               <Form className="input-group" onSubmit={handleSubmit}>
                 <Field
                   name="messageBody"
-                  placeholder="Type a message..."
+                  placeholder={t('chat.newMessage')}
                   className="form-control"
                 />
                 <button type="submit" className="btn btn-primary">
-                  Send
+                  {t('chat.send')}
                 </button>
               </Form>
             )}
@@ -184,7 +184,7 @@ const ChatPage = () => {
                 <div className="input-group">
                   <Field
                     name="name"
-                    placeholder="New Channel Name"
+                    placeholder={t('chat.addChannel')}
                     value={values.name}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -204,7 +204,7 @@ const ChatPage = () => {
                     className={`form-control ${touched.name && errors.name ? 'is-invalid' : touched.name ? 'is-valid' : ''}`}
                   />
                   <button type="submit" className="btn btn-success">
-                    Add Channel
+                    {t('chat.addChannel')}
                   </button>
                   {touched.name && errors.name && (
                     <div className="invalid-feedback">{errors.name}</div>
@@ -222,15 +222,15 @@ const ChatPage = () => {
       {/* Модальные окна для удаления и переименования каналов */}
       <Modal show={modalType === 'delete'} onHide={() => setModalType(null)}>
         <Modal.Header closeButton>
-          <Modal.Title>Delete Channel</Modal.Title>
+          <Modal.Title>{t('chat.deleteChannel')}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this channel?</Modal.Body>
+        <Modal.Body>{t('chat.confirmDelete')}</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setModalType(null)}>
-            Cancel
+            {t('chat.cancel')}
           </Button>
           <Button variant="danger" onClick={handleRemoveChannel}>
-            Delete
+            {t('chat.delete')}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -244,12 +244,12 @@ const ChatPage = () => {
           {({ errors, touched }) => (
             <Form>
               <Modal.Header closeButton>
-                <Modal.Title>Rename Channel</Modal.Title>
+                <Modal.Title>{t('chat.renameChannel')}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Field
                   name="name"
-                  placeholder="New Channel Name"
+                  placeholder={t('chat.newChannelPlaceholder')}
                   className={`form-control ${touched.name && errors.name ? 'is-invalid' : touched.name ? 'is-valid' : ''}`}
                 />
                 {touched.name && errors.name && (
@@ -258,10 +258,10 @@ const ChatPage = () => {
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="secondary" onClick={() => setModalType(null)}>
-                  Cancel
+                  {t('chat.cancel')}
                 </Button>
                 <Button type="submit" variant="primary">
-                  Rename
+                  {t('chat.renameChannel')}
                 </Button>
               </Modal.Footer>
             </Form>
