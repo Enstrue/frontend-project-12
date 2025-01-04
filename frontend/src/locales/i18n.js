@@ -45,6 +45,13 @@ const resources = {
         cancel: "Отмена",
         delete: "Удалить",
         send: "Отправить",
+        notifications: {
+          networkError: "Ошибка сети. Проверьте подключение.",
+          fetchError: "Ошибка загрузки данных.",
+          channelCreated: "Канал успешно создан.",
+          channelRenamed: "Канал успешно переименован.",
+          channelDeleted: "Канал успешно удалён.",
+        },
       },
       home: {
         welcome: "Главная страница",
