@@ -4,7 +4,7 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import leoProfanity from 'leo-profanity'; // Подключаем библиотеку для фильтрации
+import leoProfanity from 'leo-profanity';
 import {
   fetchChatData,
   sendMessage,

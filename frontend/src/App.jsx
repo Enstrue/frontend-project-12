@@ -3,32 +3,34 @@ import { useTranslation } from 'react-i18next';
 import LoginPage from './pages/LoginPage';
 import ChatPage from './pages/ChatPage';
 import SignupPage from './pages/SignupPage';
+import ErrorBoundary from './ErrorBoundary';
 
 const isAuthenticated = !!localStorage.getItem('token');
 
 const App = () => {
-
   return (
-    <Router>
-      <div>
-        <Header />
-        <Routes>
-          <Route
-            path="/login"
-            element={!isAuthenticated ? <LoginPage /> : <Navigate to="/chat" replace />}
-          />
-          <Route
-            path="/signup"
-            element={!isAuthenticated ? <SignupPage /> : <Navigate to="/chat" replace />}
-          />
-          <Route
-            path="/chat"
-            element={isAuthenticated ? <ChatPage /> : <Navigate to="/login" replace />}
-          />
-          <Route path="/" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </div>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <div>
+          <Header />
+          <Routes>
+            <Route
+              path="/login"
+              element={!isAuthenticated ? <LoginPage /> : <Navigate to="/chat" replace />}
+            />
+            <Route
+              path="/signup"
+              element={!isAuthenticated ? <SignupPage /> : <Navigate to="/chat" replace />}
+            />
+            <Route
+              path="/chat"
+              element={isAuthenticated ? <ChatPage /> : <Navigate to="/login" replace />}
+            />
+            <Route path="/" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </div>
+      </Router>
+    </ErrorBoundary>
   );
 };
 
