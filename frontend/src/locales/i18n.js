@@ -31,6 +31,7 @@ const resources = {
           usernameMax: "Имя должно содержать до 20 символов",
           passwordMin: "Пароль от 6 символов",
           confirmPassword: "Пароли должны совпадать",
+          required: "Поле обязательное для заполнения",
         },
       },
       chat: {

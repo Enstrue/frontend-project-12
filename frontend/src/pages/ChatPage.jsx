@@ -4,6 +4,7 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import leoProfanity from 'leo-profanity'; // Подключаем библиотеку для фильтрации
 import {
   fetchChatData,
   sendMessage,
@@ -27,6 +28,8 @@ const ChatPage = () => {
   const isInitialRender = useRef(true);
 
   useEffect(() => {
+    // Загрузка словаря для фильтрации
+    leoProfanity.loadDictionary('ru'); 
     dispatch(fetchChatData())
       .then(() => {
         if (channels.length > 0) {
@@ -47,7 +50,8 @@ const ChatPage = () => {
 
   const handleSendMessage = (messageBody) => {
     if (currentChannel) {
-      dispatch(sendMessage({ channelId: currentChannel, body: messageBody }))
+      const cleanedMessage = leoProfanity.clean(messageBody); // Фильтрация текста сообщения
+      dispatch(sendMessage({ channelId: currentChannel, body: cleanedMessage }))
         .catch(() => {
           toast.error(t('chat.notifications.networkError'));
         });
@@ -56,7 +60,8 @@ const ChatPage = () => {
 
   const handleAddChannel = async (values, { resetForm }) => {
     try {
-      await dispatch(addChannel(values.name)).unwrap();
+      const cleanedName = leoProfanity.clean(values.name); // Фильтрация имени канала
+      await dispatch(addChannel(cleanedName)).unwrap();
       toast.success(t('chat.notifications.channelCreated'));
       resetForm();
     } catch (err) {
@@ -82,7 +87,8 @@ const ChatPage = () => {
   const handleRenameChannel = async (newName) => {
     try {
       if (selectedChannel) {
-        await dispatch(renameChannel({ id: selectedChannel.id, name: newName })).unwrap();
+        const cleanedName = leoProfanity.clean(newName); // Фильтрация имени канала при переименовании
+        await dispatch(renameChannel({ id: selectedChannel.id, name: cleanedName })).unwrap();
         toast.success(t('chat.notifications.channelRenamed'));
         setModalType(null);
       }
@@ -96,11 +102,12 @@ const ChatPage = () => {
     name: Yup.string()
       .min(3, t('validation.usernameMin'))
       .max(20, t('validation.usernameMax'))
-      .required(t('validation.required'))
+      .required(t('signup.validation.required'))
       .test('unique', t('validation.unique'), (value) =>
         !channels.some((channel) => channel.name === value)
       ),
   });
+
 
   return (
     <div className="container py-4">
