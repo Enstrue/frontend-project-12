@@ -1,63 +1,64 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { AuthProvider, useAuth } from './contexts/AuthCont';
 import LoginPage from './pages/LoginPage';
 import ChatPage from './pages/ChatPage';
 import SignupPage from './pages/SignupPage';
 import ErrorBoundary from './ErrorBoundary';
 
-const isAuthenticated = !!localStorage.getItem('token');
-
 const App = () => {
   return (
     <ErrorBoundary>
-      <Router>
-        <div>
-          <Header />
-          <Routes>
-            <Route
-              path="/login"
-              element={!isAuthenticated ? <LoginPage /> : <Navigate to="/chat" replace />}
-            />
-            <Route
-              path="/signup"
-              element={!isAuthenticated ? <SignupPage /> : <Navigate to="/chat" replace />}
-            />
-            <Route
-              path="/chat"
-              element={isAuthenticated ? <ChatPage /> : <Navigate to="/login" replace />}
-            />
-            <Route path="/" element={<Navigate to="/login" replace />} />
-          </Routes>
-        </div>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <div>
+            <Header />
+            <Routes>
+              <Route
+                path="/login"
+                element={<ProtectedRoute redirectTo="/chat" inverse><LoginPage /></ProtectedRoute>}
+              />
+              <Route
+                path="/signup"
+                element={<ProtectedRoute redirectTo="/chat" inverse><SignupPage /></ProtectedRoute>}
+              />
+              <Route
+                path="/chat"
+                element={<ProtectedRoute redirectTo="/login"><ChatPage /></ProtectedRoute>}
+              />
+              <Route path="/" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </div>
+        </Router>
+      </AuthProvider>
     </ErrorBoundary>
   );
 };
 
 const Header = () => {
-  const { t } = useTranslation();
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.reload();
-  };
-
-  const isAuth = !!localStorage.getItem('token');
+  const { logout, isAuthenticated } = useAuth();
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">
         <a className="navbar-brand" href="/">
-          {t('header.brand')}
+          Hexlet Chat
         </a>
-        {isAuth && (
-          <button className="btn btn-outline-danger ml-auto" onClick={handleLogout}>
-            {t('header.logout')}
+        {isAuthenticated && (
+          <button className="btn btn-outline-danger ml-auto" onClick={logout}>
+            Выйти
           </button>
         )}
       </div>
     </nav>
   );
+};
+
+// eslint-disable-next-line react/prop-types
+const ProtectedRoute = ({ children, redirectTo, inverse = false }) => {
+  const { isAuthenticated } = useAuth();
+  const shouldRedirect = inverse ? isAuthenticated : !isAuthenticated;
+
+  return shouldRedirect ? <Navigate to={redirectTo} replace /> : children;
 };
 
 export default App;

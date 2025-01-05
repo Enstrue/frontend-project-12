@@ -1,21 +1,37 @@
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import apiClient from '../api/client';
+import { useAuth } from '../contexts/AuthCont'; // Контекст авторизации
 
 const SignupPage = () => {
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    // Если пользователь уже авторизован, перенаправляем его на /chat
+    if (isAuthenticated) {
+      navigate('/chat');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSignup = async (values, { setErrors }) => {
     try {
-      await apiClient.post('/api/v1/signup', {
+      const response = await apiClient.post('/api/v1/signup', {
         username: values.username,
         password: values.password,
       });
-      navigate('/login');
+
+      if (response.data?.token) {
+        // Вызываем login для обновления глобального состояния
+        login(response.data.token);
+      }
     } catch (error) {
       if (error.response?.status === 409) {
         setErrors({ username: 'Имя пользователя уже занято' });
+      } else {
+        setErrors({ username: 'Ошибка регистрации. Попробуйте позже.' });
       }
     }
   };
@@ -89,7 +105,6 @@ const SignupPage = () => {
               >
                 Зарегистрированы в Hexlet Chat? Войти
               </button>
-
             </Form>
           )}
         </Formik>
