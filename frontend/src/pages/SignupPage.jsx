@@ -3,14 +3,13 @@ import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import apiClient from '../api/client';
-import { useAuth } from '../contexts/AuthCont'; // Контекст авторизации
+import { useAuth } from '../contexts/AuthCont';
 
 const SignupPage = () => {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Если пользователь уже авторизован, перенаправляем его на /chat
     if (isAuthenticated) {
       navigate('/chat');
     }
@@ -24,7 +23,6 @@ const SignupPage = () => {
       });
 
       if (response.data?.token) {
-        // Вызываем login для обновления глобального состояния
         login(response.data.token);
       }
     } catch (error) {
@@ -40,11 +38,11 @@ const SignupPage = () => {
     username: Yup.string()
       .min(3, 'Имя должно содержать от 3 до 20 символов')
       .max(20, 'Имя должно содержать до 20 символов')
-      .required('Логин обязателен'),
-    password: Yup.string().min(6, 'Пароль от 6 символов').required('Пароль обязателен'),
+      .required('Обязательное поле'),
+    password: Yup.string().min(6, 'Пароль от 6 символов').required('Обязательное поле'),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref('password')], 'Пароли должны совпадать')
-      .required('Подтверждение пароля обязательно'),
+      .required('Обязательное поле'),
   });
 
   return (
@@ -59,38 +57,62 @@ const SignupPage = () => {
         >
           {({ errors, touched }) => (
             <Form>
-              <div className="mb-3">
+              {/* Username Field */}
+              <div className="form-floating mb-3 position-relative">
                 <Field
                   name="username"
-                  placeholder="Логин"
+                  id="username"
+                  autoComplete="username"
+                  placeholder="От 3 до 20 символов"
                   className={`form-control ${touched.username && errors.username ? 'is-invalid' : ''}`}
                 />
+                <label htmlFor="username" className="form-label">
+                  Имя пользователя
+                </label>
                 {touched.username && errors.username && (
-                  <div className="invalid-feedback">{errors.username}</div>
+                  <div className="invalid-tooltip">
+                    {errors.username}
+                  </div>
                 )}
               </div>
 
-              <div className="mb-3">
+              {/* Password Field */}
+              <div className="form-floating mb-3 position-relative">
                 <Field
                   name="password"
+                  id="password"
                   type="password"
-                  placeholder="Пароль"
+                  autoComplete="new-password"
+                  placeholder="Не менее 6 символов"
                   className={`form-control ${touched.password && errors.password ? 'is-invalid' : ''}`}
                 />
+                <label htmlFor="password" className="form-label">
+                  Пароль
+                </label>
                 {touched.password && errors.password && (
-                  <div className="invalid-feedback">{errors.password}</div>
+                  <div className="invalid-tooltip">
+                    {errors.password}
+                  </div>
                 )}
               </div>
 
-              <div className="mb-3">
+              {/* Confirm Password Field */}
+              <div className="form-floating mb-4 position-relative">
                 <Field
                   name="confirmPassword"
+                  id="confirmPassword"
                   type="password"
-                  placeholder="Подтвердите пароль"
+                  autoComplete="new-password"
+                  placeholder="Пароли должны совпадать"
                   className={`form-control ${touched.confirmPassword && errors.confirmPassword ? 'is-invalid' : ''}`}
                 />
+                <label htmlFor="confirmPassword" className="form-label">
+                  Подтвердите пароль
+                </label>
                 {touched.confirmPassword && errors.confirmPassword && (
-                  <div className="invalid-feedback">{errors.confirmPassword}</div>
+                  <div className="invalid-tooltip">
+                    {errors.confirmPassword}
+                  </div>
                 )}
               </div>
 
