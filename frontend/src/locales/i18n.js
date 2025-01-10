@@ -25,7 +25,7 @@ const resources = {
         signup: "Зарегистрироваться",
         alreadyRegistered: "Зарегистрированы в Hexlet Chat?",
         login: "Войти",
-        usernameTaken: "Имя пользователя уже занято",
+        usernameTaken: "Такой пользователь уже существует",
         validation: {
           usernameMin: "Имя должно содержать от 3 до 20 символов",
           usernameMax: "Имя должно содержать до 20 символов",

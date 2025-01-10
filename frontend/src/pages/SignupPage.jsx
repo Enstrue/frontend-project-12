@@ -27,7 +27,7 @@ const SignupPage = () => {
       }
     } catch (error) {
       if (error.response?.status === 409) {
-        setErrors({ username: 'Имя пользователя уже занято' });
+        setErrors({ username: 'Такой пользователь уже существует' });
       } else {
         setErrors({ username: 'Ошибка регистрации. Попробуйте позже.' });
       }
