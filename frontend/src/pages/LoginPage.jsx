@@ -4,11 +4,13 @@ import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../contexts/AuthCont';
+import { useTranslation } from 'react-i18next';
 
 const LoginPage = () => {
   const [generalError, setGeneralError] = useState('');
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   
   useEffect(() => {
       if (isAuthenticated) {
@@ -35,7 +37,7 @@ const LoginPage = () => {
       navigate('/chat');
     } catch (error) {
       if (error.response?.status === 401) {
-        setGeneralError('Неправильный логин или пароль');
+        setGeneralError(t('login.error'));
       }
     }
   };
@@ -57,7 +59,7 @@ const LoginPage = () => {
               <div className="mb-3">
                 <Field
                   name="username"
-                  placeholder="Имя пользователя"
+                  placeholder={t('login.username')}
                   className={`form-control ${errors.username && touched.username ? 'is-invalid' : ''}`}
                 />
                 {errors.username && touched.username && (
@@ -69,7 +71,7 @@ const LoginPage = () => {
                 <Field
                   name="password"
                   type="password"
-                  placeholder="Пароль"
+                  placeholder={t('login.password')}
                   className={`form-control ${errors.password && touched.password ? 'is-invalid' : ''}`}
                 />
                 {errors.password && touched.password && (
@@ -78,20 +80,20 @@ const LoginPage = () => {
               </div>
 
               <button type="submit" className="btn btn-primary w-100 mt-2">
-                Войти
+                {t('login.login')}
               </button>
             </Form>
           )}
         </Formik>
 
         <p className="mt-3 text-center">
-          Нет аккаунта в Hexlet Chat?{' '}
+          {t('login.noAccount')}{' '}
           <button
             type="button"
             className="btn btn-link"
             onClick={() => navigate('/signup')}
           >
-            Регистрация
+            {t('login.signup')}
           </button>
         </p>
       </div>
