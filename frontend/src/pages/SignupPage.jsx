@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import apiClient from '../api/client';
 import { useAuth } from '../contexts/AuthCont';
+import { useTranslation } from 'react-i18next';
 
 const SignupPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { login, isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -36,13 +38,13 @@ const SignupPage = () => {
 
   const validationSchema = Yup.object({
     username: Yup.string()
-      .min(3, 'Имя должно содержать от 3 до 20 символов')
-      .max(20, 'Имя должно содержать до 20 символов')
-      .required('Обязательное поле'),
-    password: Yup.string().min(6, 'Пароль от 6 символов').required('Обязательное поле'),
+      .min(3, t('signup.validation.username'))
+      .max(20, t('signup.validation.username'))
+      .required(t('signup.validation.required')),
+    password: Yup.string().min(6, t('signup.validation.password')).required(t('signup.validation.required')),
     confirmPassword: Yup.string()
-      .oneOf([Yup.ref('password')], 'Пароли должны совпадать')
-      .required('Обязательное поле'),
+      .oneOf([Yup.ref('password')], t('signup.validation.confirmPassword'))
+      .required(t('signup.validation.required')),
   });
 
   return (
