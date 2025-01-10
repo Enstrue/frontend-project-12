@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
+import { useAuth } from '../contexts/AuthCont';
 
 const LoginPage = () => {
   const [generalError, setGeneralError] = useState('');
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  
+  useEffect(() => {
+      if (isAuthenticated) {
+        navigate('/chat');
+      }
+    }, [isAuthenticated, navigate]);
 
   const validationSchema = Yup.object({
     username: Yup.string().required('Введите имя пользователя'),

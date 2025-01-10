@@ -125,12 +125,14 @@ const ChatPage = () => {
                 key={channel.id}
                 className={`list-group-item d-flex justify-content-between align-items-center ${currentChannel === channel.id ? 'active text-white' : ''}`}
               >
-                <span onClick={() => handleChannelChange(channel.id)} style={{ cursor: 'pointer' }}>
+                <button onClick={() => handleChannelChange(channel.id)}
+                  className={`w-100 rounded-0 text-start btn`}
+                  style={{ cursor: 'pointer' }}>
                   #{channel.name}
-                </span>
+                </button>
                 <Dropdown>
                   <Dropdown.Toggle size="sm" variant="secondary">
-                    {t('chat.actions')}
+                    {/* {t('chat.actions')} */}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
                     <Dropdown.Item
