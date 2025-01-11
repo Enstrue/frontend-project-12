@@ -9,11 +9,11 @@ const resources = {
         logout: "Выйти",
       },
       login: {
-        title: "Вход в Hexlet Chat",
+        title: "Войти",
         username: "Ваш ник",
         password: "Пароль",
         login: "Войти",
-        noAccount: "Нет аккаунта в Hexlet Chat?",
+        noAccount: "Нет аккаунта?",
         signup: "Регистрация",
         error: "Неверные имя пользователя или пароль",
       },

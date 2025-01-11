@@ -121,14 +121,6 @@ const SignupPage = () => {
               <button type="submit" className="btn btn-success w-100 mt-2">
                 Зарегистрироваться
               </button>
-
-              <button
-                type="button"
-                className="btn btn-link mt-2 d-block text-center"
-                onClick={() => navigate('/login')}
-              >
-                Зарегистрированы в Hexlet Chat? Войти
-              </button>
             </Form>
           )}
         </Formik>

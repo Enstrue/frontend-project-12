@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../contexts/AuthCont';
 import { useTranslation } from 'react-i18next';
@@ -13,10 +13,10 @@ const LoginPage = () => {
   const { t } = useTranslation();
   
   useEffect(() => {
-      if (isAuthenticated) {
-        navigate('/chat');
-      }
-    }, [isAuthenticated, navigate]);
+    if (isAuthenticated) {
+      navigate('/chat');
+    }
+  }, [isAuthenticated, navigate]);
 
   const validationSchema = Yup.object({
     username: Yup.string().required('Введите имя пользователя'),
@@ -45,7 +45,7 @@ const LoginPage = () => {
   return (
     <div className="d-flex align-items-center justify-content-center vh-100">
       <div className="card p-4" style={{ maxWidth: '400px', width: '100%' }}>
-        <h2>Вход в Hexlet Chat</h2>
+        <h1 className='text-center mb-4'>{t('login.title')}</h1>
 
         {generalError && <div className="alert alert-danger">{generalError}</div>}
 
@@ -56,26 +56,42 @@ const LoginPage = () => {
         >
           {({ errors, touched }) => (
             <Form>
-              <div className="mb-3">
+              {/* Username Field */}
+              <div className="form-floating mb-3 position-relative">
                 <Field
                   name="username"
+                  id="username"
+                  autoComplete="username"
                   placeholder={t('login.username')}
-                  className={`form-control ${errors.username && touched.username ? 'is-invalid' : ''}`}
+                  className={`form-control ${touched.username && errors.username ? 'is-invalid' : ''}`}
                 />
-                {errors.username && touched.username && (
-                  <div className="invalid-feedback">{errors.username}</div>
+                <label htmlFor="username" className="form-label">
+                  {t('login.username')}
+                </label>
+                {touched.username && errors.username && (
+                  <div className="invalid-tooltip">
+                    {errors.username}
+                  </div>
                 )}
               </div>
 
-              <div className="mb-3">
+              {/* Password Field */}
+              <div className="form-floating mb-3 position-relative">
                 <Field
                   name="password"
+                  id="password"
                   type="password"
+                  autoComplete="current-password"
                   placeholder={t('login.password')}
-                  className={`form-control ${errors.password && touched.password ? 'is-invalid' : ''}`}
+                  className={`form-control ${touched.password && errors.password ? 'is-invalid' : ''}`}
                 />
-                {errors.password && touched.password && (
-                  <div className="invalid-feedback">{errors.password}</div>
+                <label htmlFor="password" className="form-label">
+                  {t('login.password')}
+                </label>
+                {touched.password && errors.password && (
+                  <div className="invalid-tooltip">
+                    {errors.password}
+                  </div>
                 )}
               </div>
 
@@ -88,13 +104,9 @@ const LoginPage = () => {
 
         <p className="mt-3 text-center">
           {t('login.noAccount')}{' '}
-          <button
-            type="button"
-            className="btn btn-link"
-            onClick={() => navigate('/signup')}
-          >
+          <Link to="/signup" className="text-decoration-none">
             {t('login.signup')}
-          </button>
+          </Link>
         </p>
       </div>
     </div>
