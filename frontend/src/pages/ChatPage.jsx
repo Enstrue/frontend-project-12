@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 const ChatPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const username = useSelector((state) => state.auth.username);
 
   const { channels, messages, status, error } = useSelector((state) => state.chat);
 
@@ -52,7 +53,7 @@ const ChatPage = () => {
   const handleSendMessage = (messageBody) => {
     if (currentChannel) {
       const cleanedMessage = leoProfanity.clean(messageBody);
-      dispatch(sendMessage({ channelId: currentChannel, body: cleanedMessage }))
+      dispatch(sendMessage({ channelId: currentChannel, body: cleanedMessage, username }))
         .catch(() => {
           toast.error(t('chat.notifications.networkError'));
         });
