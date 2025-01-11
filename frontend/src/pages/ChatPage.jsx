@@ -187,6 +187,7 @@ const ChatPage = () => {
               <Form className="input-group" onSubmit={handleSubmit}>
                 <Field
                   name="messageBody"
+                  aria-label="Новое сообщение"
                   placeholder={t('chat.newMessage')}
                   className="form-control"
                 />
