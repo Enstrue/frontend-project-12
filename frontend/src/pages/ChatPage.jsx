@@ -74,11 +74,13 @@ const ChatPage = () => {
 
   const handleRemoveChannel = async () => {
     try {
-      if (selectedChannel && selectedChannel.id !== defaultChannelId) {
+      if (selectedChannel && selectedChannel.id !== defaultChannelId && !['general', 'random'].includes(selectedChannel.name)) {
         await dispatch(removeChannel(selectedChannel.id)).unwrap();
         toast.success(t('chat.notifications.channelDeleted'));
         setCurrentChannel(defaultChannelId);
         setModalType(null);
+      } else {
+        toast.error(t('chat.notifications.protectedChannelDeleteError'));
       }
     } catch (err) {
       toast.error(t('chat.notifications.networkError'));
@@ -88,11 +90,13 @@ const ChatPage = () => {
 
   const handleRenameChannel = async (newName) => {
     try {
-      if (selectedChannel) {
+      if (selectedChannel && !['general', 'random'].includes(selectedChannel.name)) {
         const cleanedName = leoProfanity.clean(newName);
         await dispatch(renameChannel({ id: selectedChannel.id, name: cleanedName })).unwrap();
         toast.success(t('chat.notifications.channelRenamed'));
         setModalType(null);
+      } else {
+        toast.error(t('chat.notifications.protectedChannelRenameError'));
       }
     } catch (err) {
       toast.error(t('chat.notifications.networkError'));
@@ -141,20 +145,21 @@ const ChatPage = () => {
                 >
                   #{channel.name}
                 </button>
-                <Dropdown>
-                  <Dropdown.Toggle size="sm" variant="secondary">
-                    <span className="visually-hidden">{'Управление каналом'}</span>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item
-                      onClick={() => {
-                        setSelectedChannel(channel);
-                        setModalType('rename');
-                      }}
-                    >
-                      {t('chat.renameChannel')}
-                    </Dropdown.Item>
-                    {channel.id !== defaultChannelId && (
+                {/* Отображаем кнопку управления только если канал не 'general' и не 'random' */}
+                {channel.name !== 'general' && channel.name !== 'random' && (
+                  <Dropdown>
+                    <Dropdown.Toggle size="sm" variant="secondary">
+                      <span className="visually-hidden">{'Управление каналом'}</span>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <Dropdown.Item
+                        onClick={() => {
+                          setSelectedChannel(channel);
+                          setModalType('rename');
+                        }}
+                      >
+                        {t('chat.renameChannel')}
+                      </Dropdown.Item>
                       <Dropdown.Item
                         onClick={() => {
                           setSelectedChannel(channel);
@@ -163,9 +168,9 @@ const ChatPage = () => {
                       >
                         {t('chat.delete')}
                       </Dropdown.Item>
-                    )}
-                  </Dropdown.Menu>
-                </Dropdown>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                )}
               </li>
             ))}
           </ul>
