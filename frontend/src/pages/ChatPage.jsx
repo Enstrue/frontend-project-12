@@ -30,6 +30,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     leoProfanity.loadDictionary('ru');
+    leoProfanity.loadDictionary('en');
     dispatch(fetchChatData())
       .then(() => {
         if (channels.length > 0) {
