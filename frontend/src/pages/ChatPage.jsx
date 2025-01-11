@@ -277,9 +277,11 @@ const ChatPage = () => {
               <Modal.Body>
                 <Field
                   name="name"
+                  id="name"
                   placeholder={t('chat.newChannelPlaceholder')}
                   className={`form-control ${touched.name && errors.name ? 'is-invalid' : touched.name ? 'is-valid' : ''}`}
                 />
+                <label htmlFor="name" className="visually-hidden">{'Имя канала'}</label>
                 {touched.name && errors.name && (
                   <div className="invalid-feedback">{errors.name}</div>
                 )}
