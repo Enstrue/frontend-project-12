@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 const ChatPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  
+
   const { channels, messages, status, error } = useSelector((state) => state.chat);
 
   const [currentChannel, setCurrentChannel] = useState('');
@@ -28,7 +28,6 @@ const ChatPage = () => {
 
   const isInitialRender = useRef(true);
 
-  // Загрузка данных каналов при первом рендере
   useEffect(() => {
     leoProfanity.loadDictionary('ru');
     dispatch(fetchChatData())
@@ -65,7 +64,7 @@ const ChatPage = () => {
       await dispatch(addChannel(cleanedName)).unwrap();
       toast.success(t('chat.notifications.channelCreated'));
       resetForm();
-      setModalType(null); // Закрытие модального окна
+      setModalType(null);
     } catch (err) {
       toast.error(t('chat.notifications.networkError'));
       console.error(err);
@@ -114,16 +113,15 @@ const ChatPage = () => {
     <div className="container py-4">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="row">
-        {/* Секция каналов */}
         <div className="col-md-4 border-end">
-          <h4 className="d-flex justify-content-between">
+          <h4 className="d-flex justify-content-between align-items-center">
             {t('chat.channels')}
             <Button variant="primary" onClick={() => setModalType('add')}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" className="me-1">
-              <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"></path>
-              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
-            </svg>
-            <span className="visually-hidden">+</span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" className="me-1">
+                <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"></path>
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
+              </svg>
+              <span className="visually-hidden">+</span>
             </Button>
           </h4>
 
@@ -135,13 +133,17 @@ const ChatPage = () => {
                 key={channel.id}
                 className={`list-group-item d-flex justify-content-between align-items-center ${currentChannel === channel.id ? 'active text-white' : ''}`}
               >
-                <button onClick={() => handleChannelChange(channel.id)}
+                <button
+                  onClick={() => handleChannelChange(channel.id)}
                   className={`w-100 rounded-0 text-start btn`}
-                  style={{ cursor: 'pointer' }}>
+                  style={{ cursor: 'pointer' }}
+                >
                   #{channel.name}
                 </button>
                 <Dropdown>
-                  <Dropdown.Toggle size="sm" variant="secondary" />
+                  <Dropdown.Toggle size="sm" variant="secondary">
+                    <span className="visually-hidden">{'Управление каналом'}</span>
+                  </Dropdown.Toggle>
                   <Dropdown.Menu>
                     <Dropdown.Item
                       onClick={() => {
@@ -168,7 +170,6 @@ const ChatPage = () => {
           </ul>
         </div>
 
-        {/* Секция сообщений и отправки */}
         <div className="col-md-8">
           <h4>
             {t('chat.chatIn')} {currentChannel ? `#${channels.find((ch) => ch.id === currentChannel)?.name}` : ''}
@@ -208,7 +209,6 @@ const ChatPage = () => {
         </div>
       </div>
 
-      {/* Модальные окна для создания, удаления и переименования каналов */}
       <Modal show={modalType === 'add'} onHide={() => setModalType(null)}>
         <Formik
           initialValues={{ name: '' }}
@@ -231,7 +231,7 @@ const ChatPage = () => {
                   Имя канала
                 </label>
                 {touched.name && errors.name && (
-                  <div className="invalid-feedback">{errors.name}</div>
+                  <div className="invalid-feedback">{t('signup.validation.username')}</div>
                 )}
               </Modal.Body>
               <Modal.Footer>
@@ -247,7 +247,6 @@ const ChatPage = () => {
         </Formik>
       </Modal>
 
-      {/* Модальное окно для удаления канала */}
       <Modal show={modalType === 'delete'} onHide={() => setModalType(null)}>
         <Modal.Header closeButton>
           <Modal.Title>{t('chat.deleteChannel')}</Modal.Title>
@@ -263,7 +262,6 @@ const ChatPage = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Модальное окно для переименования канала */}
       <Modal show={modalType === 'rename'} onHide={() => setModalType(null)}>
         <Formik
           initialValues={{ name: selectedChannel?.name || '' }}

@@ -48,10 +48,13 @@ const resources = {
         notifications: {
           networkError: "Ошибка сети. Проверьте подключение.",
           fetchError: "Ошибка загрузки данных.",
-          channelCreated: "Канал успешно создан.",
-          channelRenamed: "Канал успешно переименован.",
-          channelDeleted: "Канал успешно удалён.",
+          channelCreated: "Канал создан",
+          channelRenamed: "Канал переименован",
+          channelDeleted: "Канал удалён",
         },
+      },
+      validation: {
+        unique: "Имя канала уже занято",
       },
       home: {
         welcome: "Главная страница",
