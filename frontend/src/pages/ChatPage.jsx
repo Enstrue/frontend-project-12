@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 const ChatPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  
   const { channels, messages, status, error } = useSelector((state) => state.chat);
 
   const [currentChannel, setCurrentChannel] = useState(channels[0]?.id || '');

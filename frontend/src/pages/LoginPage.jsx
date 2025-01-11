@@ -9,35 +9,43 @@ import { useTranslation } from 'react-i18next';
 const LoginPage = () => {
   const [generalError, setGeneralError] = useState('');
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { login, isAuthenticated } = useAuth(); // Используем login и isAuthenticated из контекста
   const { t } = useTranslation();
   
+  // Если пользователь уже авторизован, перенаправляем на /chat
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/chat');
     }
   }, [isAuthenticated, navigate]);
 
+  // Валидация для полей формы
   const validationSchema = Yup.object({
-    username: Yup.string().required('Введите имя пользователя'),
-    password: Yup.string().required('Введите пароль'),
+    username: Yup.string().required(t('login.validation.username')),
+    password: Yup.string().required(t('login.validation.password')),
   });
 
+  // Обработчик логина
   const handleLogin = async (values, { resetForm }) => {
     try {
+      // Отправляем запрос на сервер для авторизации
       const response = await apiClient.post('/api/v1/login', {
         username: values.username,
         password: values.password,
       });
 
-      localStorage.setItem('token', response.data.token);
+      // Сохраняем токен в локальное хранилище и обновляем состояние авторизации через контекст
+      login(response.data.token);
       resetForm();
 
-      // Перенаправляем пользователя на /chat
+      // Перенаправляем пользователя на страницу чата
       navigate('/chat');
     } catch (error) {
+      // Обрабатываем ошибки при логине
       if (error.response?.status === 401) {
         setGeneralError(t('login.error'));
+      } else {
+        setGeneralError(t('login.generalError'));
       }
     }
   };
@@ -45,8 +53,9 @@ const LoginPage = () => {
   return (
     <div className="d-flex align-items-center justify-content-center vh-100">
       <div className="card p-4" style={{ maxWidth: '400px', width: '100%' }}>
-        <h1 className='text-center mb-4'>{t('login.title')}</h1>
+        <h1 className="text-center mb-4">{t('login.title')}</h1>
 
+        {/* Отображаем общую ошибку */}
         {generalError && <div className="alert alert-danger">{generalError}</div>}
 
         <Formik
@@ -56,7 +65,7 @@ const LoginPage = () => {
         >
           {({ errors, touched }) => (
             <Form>
-              {/* Username Field */}
+              {/* Поле для имени пользователя */}
               <div className="form-floating mb-3 position-relative">
                 <Field
                   name="username"
@@ -75,7 +84,7 @@ const LoginPage = () => {
                 )}
               </div>
 
-              {/* Password Field */}
+              {/* Поле для пароля */}
               <div className="form-floating mb-3 position-relative">
                 <Field
                   name="password"
@@ -102,6 +111,7 @@ const LoginPage = () => {
           )}
         </Formik>
 
+        {/* Ссылка на страницу регистрации */}
         <p className="mt-3 text-center">
           {t('login.noAccount')}{' '}
           <Link to="/signup" className="text-decoration-none">
