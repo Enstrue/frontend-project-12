@@ -145,7 +145,7 @@ const ChatPage = () => {
               >
                 <button
                   onClick={() => handleChannelChange(channel.id)}
-                  className={`w-100 rounded-0 text-start btn`}
+                  className={`w-100 rounded-0 text-start text-truncate btn btn-secondary`}
                   style={{ cursor: 'pointer' }}
                 >
                   #{channel.name}
