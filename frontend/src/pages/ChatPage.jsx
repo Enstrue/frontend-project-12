@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 const ChatPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const username = useSelector((state) => state.auth.username);
+  const username = useSelector((state) => state.user.username); // Добавленное получение имени пользователя
 
   const { channels, messages, status, error } = useSelector((state) => state.chat);
 
@@ -53,7 +53,11 @@ const ChatPage = () => {
   const handleSendMessage = (messageBody) => {
     if (currentChannel) {
       const cleanedMessage = leoProfanity.clean(messageBody);
-      dispatch(sendMessage({ channelId: currentChannel, body: cleanedMessage, username }))
+      dispatch(sendMessage({ channelId: currentChannel,
+        body: cleanedMessage,
+        username: username,
+        timestamp: new Date().toISOString(),
+      }))
         .catch(() => {
           toast.error(t('chat.notifications.networkError'));
         });
@@ -146,7 +150,6 @@ const ChatPage = () => {
                 >
                   #{channel.name}
                 </button>
-                {/* Отображаем кнопку управления только если канал не 'general' и не 'random' */}
                 {channel.name !== 'general' && channel.name !== 'random' && (
                   <Dropdown>
                     <Dropdown.Toggle size="sm" variant="secondary">
@@ -184,10 +187,10 @@ const ChatPage = () => {
 
           <div className="chat-box border rounded p-3 mb-3" style={{ height: '300px', overflowY: 'scroll' }}>
             {messages
-              .filter((msg) => msg.channelId === currentChannel)
+              .filter((msg) => msg.channelId === currentChannel)  // Фильтрация по текущему каналу
               .map((message) => (
                 <div key={message.id} className="mb-2">
-                  <strong>{message.username}:</strong> {message.body}
+                  <strong>{message.userName}:</strong> {message.body} {/* Используем message.username вместо username */}
                 </div>
               ))}
           </div>

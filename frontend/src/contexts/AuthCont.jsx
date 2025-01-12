@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Синхронизируем состояние при загрузке приложения
     setIsAuthenticated(!!localStorage.getItem('token'));
   }, []);
 
@@ -30,3 +29,4 @@ export const AuthProvider = ({ children }) => {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
+

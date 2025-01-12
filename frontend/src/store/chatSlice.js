@@ -16,7 +16,7 @@ export const fetchChatData = createAsyncThunk('chat/fetchData', async () => {
 
     return {
       channels: channelsResponse.data,
-      messages: messagesResponse.data
+      messages: messagesResponse.data,
     };
   } catch (err) {
     throw new Error('Failed to fetch chat data:', err);
@@ -24,11 +24,11 @@ export const fetchChatData = createAsyncThunk('chat/fetchData', async () => {
 });
 
 // Отправка нового сообщения
-export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ channelId, body }) => {
+export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ channelId, body, username }) => {
   const token = localStorage.getItem('token');
   const response = await apiClient.post(
     `/api/v1/messages`,
-    { body, channelId },
+    { body, channelId, userName: username },
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
@@ -47,6 +47,7 @@ export const addChannel = createAsyncThunk('chat/addChannel', async (name) => {
   return response.data;
 });
 
+// Удаление канала
 export const removeChannel = createAsyncThunk('chat/removeChannel', async (channelId) => {
   const token = localStorage.getItem('token');
   const response = await apiClient.delete(`/api/v1/channels/${channelId}`, {
@@ -56,6 +57,7 @@ export const removeChannel = createAsyncThunk('chat/removeChannel', async (chann
   return response.data;
 });
 
+// Переименование канала
 export const renameChannel = createAsyncThunk('chat/renameChannel', async ({ id, name }) => {
   const token = localStorage.getItem('token');
   const response = await apiClient.patch(
@@ -72,6 +74,7 @@ const chatSlice = createSlice({
   initialState: {
     channels: [],
     messages: [],
+    username: '',  // Добавляем поле для имени пользователя
     status: 'idle',
     error: null
   },
@@ -87,25 +90,26 @@ const chatSlice = createSlice({
         state.status = 'succeeded';
         state.channels = action.payload.channels;
         state.messages = action.payload.messages;
+        state.username = action.payload.username;  // Сохраняем имя пользователя
       })
       .addCase(fetchChatData.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
-        state.messages.push(action.payload);
+        state.messages.push(action.payload);  // Добавление нового сообщения в state
       })
       .addCase(addChannel.fulfilled, (state, action) => {
-        state.channels.push(action.payload);
+        state.channels.push(action.payload);  // Добавление нового канала в state
       })
       .addCase(removeChannel.fulfilled, (state, action) => {
         state.channels = state.channels.filter((channel) => channel.id !== action.payload.id);
-        state.messages = state.messages.filter((msg) => msg.channelId !== action.payload.id);
+        state.messages = state.messages.filter((msg) => msg.channelId !== action.payload.id);  // Удаляем сообщения канала
       })
       .addCase(renameChannel.fulfilled, (state, action) => {
         const index = state.channels.findIndex((channel) => channel.id === action.payload.id);
         if (index !== -1) {
-          state.channels[index] = action.payload;
+          state.channels[index] = action.payload;  // Обновляем название канала
         }
       });
   }
