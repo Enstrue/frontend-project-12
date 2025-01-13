@@ -265,6 +265,9 @@ const ChatPage = () => {
                       : ""
                   }`}
                 />
+              <span className="visually-hidden">
+                {"Имя канала"}
+              </span>
                 {touched.name && errors.name && (
                   <div className="invalid-feedback">{errors.name}</div>
                 )}
