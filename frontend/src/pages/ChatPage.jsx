@@ -75,7 +75,8 @@ const ChatPage = () => {
       const cleanedName = leoProfanity.clean(values.name);
       const newChannel = await dispatch(addNewChannel(cleanedName)).unwrap();
       if (username) {
-        setCurrentChannel(newChannel.id);  // Переключаем только у инициатора
+        // Переключение только для инициатора
+        setCurrentChannel(newChannel.id);
       }
       toast.success(<CustomToast message={t("chat.notifications.channelCreated")} />);
       resetForm();
@@ -158,7 +159,9 @@ const ChatPage = () => {
                     <button
                       type="button"
                       onClick={() => handleChannelChange(channel.id)}
-                      className={`w-100 rounded-0 text-start btn ${isActive ? "btn-secondary" : ""}`}
+                      className={`w-100 rounded-0 text-start btn ${
+                        isActive ? "btn-secondary" : ""
+                      }`}
                     >
                       <span className="me-1">#</span>
                       {channel.name}
@@ -173,7 +176,7 @@ const ChatPage = () => {
                   <Dropdown as="div" className={`btn-group w-100 custom-dropdown ${isActive ? "active" : ""}`}>
                     <Button
                     variant=""
-                      className={`w-100 rounded-0 text-start text-truncate btn ${isActive ? "btn-secondary" : ""}`}
+                    className={`w-100 rounded-0 text-start ${isActive ? "btn-secondary" : "text-truncate"}`}
                       onClick={() => handleChannelChange(channel.id)}
                     >
                       <span className="me-1">#</span>
@@ -230,7 +233,6 @@ const ChatPage = () => {
       </div>
 
       {/* Modals for Add, Delete, and Rename Channels */}
-      {/* Add Channel Modal */}
       <Modal show={modalType === "add"} onHide={() => setModalType(null)}>
         <Formik initialValues={{ name: "" }} validationSchema={validationSchema} onSubmit={handleAddChannel}>
           {({ errors, touched }) => (
@@ -240,53 +242,39 @@ const ChatPage = () => {
               </Modal.Header>
               <Modal.Body>
                 <Field
-                  type="text"
                   name="name"
-                  placeholder={t("chat.enterChannelName")}
-                  className={`form-control ${errors.name && touched.name ? "is-invalid" : ""}`}
+                  id="name"
+                  className={`form-control ${touched.name && errors.name ? "is-invalid" : touched.name ? "is-valid" : ""}`}
                 />
-                <div className="invalid-feedback">
-                  {errors.name && touched.name && errors.name}
-                </div>
+                <label htmlFor="name" className="visually-hidden">
+                  {"Имя канала"}
+                </label>
+                {touched.name && errors.name && <div className="invalid-feedback">{errors.name}</div>}
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={() => setModalType(null)}>
-                  {t("cancel")}
-                </Button>
-                <Button variant="primary" type="submit">
-                  {t("save")}
-                </Button>
+                <Button variant="secondary" onClick={() => setModalType(null)}>{t("chat.cancel")}</Button>
+                <Button type="submit" variant="primary">{t("chat.send")}</Button>
               </Modal.Footer>
             </Form>
           )}
         </Formik>
       </Modal>
 
-      {/* Delete Channel Modal */}
+      {/* Modal for Deleting Channel */}
       <Modal show={modalType === "delete"} onHide={() => setModalType(null)}>
         <Modal.Header closeButton>
           <Modal.Title>{t("chat.deleteChannel")}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <p>{t("chat.deleteConfirmation")}</p>
-        </Modal.Body>
+        <Modal.Body>{t("chat.confirmDelete")}</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setModalType(null)}>
-            {t("cancel")}
-          </Button>
-          <Button variant="danger" onClick={handleRemoveChannel}>
-            {t("delete")}
-          </Button>
+          <Button variant="secondary" onClick={() => setModalType(null)}>{t("chat.cancel")}</Button>
+          <Button variant="danger" onClick={handleRemoveChannel}>{t("chat.delete")}</Button>
         </Modal.Footer>
       </Modal>
 
-      {/* Rename Channel Modal */}
+      {/* Modal for Renaming Channel */}
       <Modal show={modalType === "rename"} onHide={() => setModalType(null)}>
-        <Formik
-          initialValues={{ name: selectedChannel?.name || "" }}
-          validationSchema={validationSchema}
-          onSubmit={({ name }) => handleRenameChannel(name)}
-        >
+        <Formik initialValues={{ name: selectedChannel?.name || "" }} validationSchema={validationSchema} onSubmit={({ name }) => handleRenameChannel(name)}>
           {({ errors, touched }) => (
             <Form>
               <Modal.Header closeButton>
@@ -294,22 +282,18 @@ const ChatPage = () => {
               </Modal.Header>
               <Modal.Body>
                 <Field
-                  type="text"
                   name="name"
-                  placeholder={t("chat.enterNewChannelName")}
-                  className={`form-control ${errors.name && touched.name ? "is-invalid" : ""}`}
+                  id="name"
+                  className={`form-control ${touched.name && errors.name ? "is-invalid" : touched.name ? "is-valid" : ""}`}
                 />
-                <div className="invalid-feedback">
-                  {errors.name && touched.name && errors.name}
-                </div>
+                <label htmlFor="name" className="visually-hidden">
+                  {"Имя канала"}
+                </label>
+                {touched.name && errors.name && <div className="invalid-feedback">{errors.name}</div>}
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={() => setModalType(null)}>
-                  {t("cancel")}
-                </Button>
-                <Button variant="primary" type="submit">
-                  {t("save")}
-                </Button>
+                <Button variant="secondary" onClick={() => setModalType(null)}>{t("chat.cancel")}</Button>
+                <Button type="submit" variant="primary">{t("chat.renameChannel")}</Button>
               </Modal.Footer>
             </Form>
           )}
