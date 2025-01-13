@@ -173,16 +173,13 @@ const ChatPage = () => {
               return (
                 <li key={channel.id} className="nav-item w-100">
                   <Dropdown as="div" className={`btn-group w-100 custom-dropdown ${isActive ? "active" : ""}`}>
-                    <Button
-                      variant=""
-                      className={`w-100 rounded-0 text-start text-truncate ${
-                        isActive ? "btn-secondary" : ""
-                      }`}
+                    <button
+                      className={`w-100 rounded-0 text-start text-truncate ${ isActive ? "btn btn-secondary" : "btn" }`}
                       onClick={() => handleChannelChange(channel.id)}
                     >
                       <span className="me-1">#</span>
                       {channel.name}
-                    </Button>
+                    </button>
                     <Dropdown.Toggle
                       split
                       variant={isActive ? "secondary" : "light"}
