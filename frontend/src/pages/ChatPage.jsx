@@ -1,50 +1,53 @@
-import { useEffect, useState, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import leoProfanity from 'leo-profanity';
+import { useEffect, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import leoProfanity from "leo-profanity";
 import {
   fetchChatData,
   sendMessage,
-  addChannel,
-  removeChannel,
-  renameChannel
-} from '../store/chatSlice';
-import { Modal, Button, Dropdown } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
+  addNewChannel,
+  removeExistingChannel,
+  renameExistingChannel,
+} from "../store/chatSlice";
+import { Modal, Button, Dropdown } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 const ChatPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const username = useSelector((state) => state.user.username); // Добавленное получение имени пользователя
+  const username = useSelector((state) => state.user.username);
 
-  const { channels, messages, status, error } = useSelector((state) => state.chat);
+  const { channels, messages, status, error } = useSelector(
+    (state) => state.chat
+  );
 
-  const [currentChannel, setCurrentChannel] = useState('');
+  const [currentChannel, setCurrentChannel] = useState("");
   const [modalType, setModalType] = useState(null);
   const [selectedChannel, setSelectedChannel] = useState(null);
-  const defaultChannelId = channels[0]?.id || '';
+  const defaultChannelId = channels[0]?.id || "";
 
   const isInitialRender = useRef(true);
 
   useEffect(() => {
-    leoProfanity.loadDictionary('ru');
-    leoProfanity.loadDictionary('en');
+    leoProfanity.loadDictionary("ru");
+    leoProfanity.loadDictionary("en");
     dispatch(fetchChatData())
       .then(() => {
-        if (channels.length > 0) {
-          if (isInitialRender.current) {
-            setCurrentChannel(channels.find(channel => channel.name === 'general')?.id || channels[0]?.id || '');
-            isInitialRender.current = false;
-          }
+        if (channels.length > 0 && isInitialRender.current) {
+          setCurrentChannel(
+            channels.find((channel) => channel.name === "general")?.id ||
+              defaultChannelId
+          );
+          isInitialRender.current = false;
         }
       })
       .catch(() => {
-        toast.error(t('chat.notifications.fetchError'));
+        toast.error(t("chat.notifications.fetchError"));
       });
-  }, [dispatch, channels, t]);
+  }, [dispatch, t, channels, defaultChannelId]);
 
   const handleChannelChange = (channelId) => {
     setCurrentChannel(channelId);
@@ -53,69 +56,79 @@ const ChatPage = () => {
   const handleSendMessage = (messageBody) => {
     if (currentChannel) {
       const cleanedMessage = leoProfanity.clean(messageBody);
-      dispatch(sendMessage({ channelId: currentChannel,
-        body: cleanedMessage,
-        username: username,
-        timestamp: new Date().toISOString(),
-      }))
-        .catch(() => {
-          toast.error(t('chat.notifications.networkError'));
-        });
+      dispatch(
+        sendMessage({
+          channelId: currentChannel,
+          body: cleanedMessage,
+          username,
+          timestamp: new Date().toISOString(),
+        })
+      ).catch(() => {
+        toast.error(t("chat.notifications.networkError"));
+      });
     }
   };
+
+  const isProtectedChannel = (channel) =>
+    ["general", "random"].includes(channel.name);
 
   const handleAddChannel = async (values, { resetForm }) => {
     try {
       const cleanedName = leoProfanity.clean(values.name);
-      await dispatch(addChannel(cleanedName)).unwrap();
-      toast.success(t('chat.notifications.channelCreated'));
+      await dispatch(addNewChannel(cleanedName)).unwrap();
+      toast.success(t("chat.notifications.channelCreated"));
       resetForm();
       setModalType(null);
-    } catch (err) {
-      toast.error(t('chat.notifications.networkError'));
-      console.error(err);
+    } catch {
+      toast.error(t("chat.notifications.networkError"));
     }
   };
 
   const handleRemoveChannel = async () => {
     try {
-      if (selectedChannel && selectedChannel.id !== defaultChannelId && !['general', 'random'].includes(selectedChannel.name)) {
-        await dispatch(removeChannel(selectedChannel.id)).unwrap();
-        toast.success(t('chat.notifications.channelDeleted'));
+      if (
+        selectedChannel &&
+        selectedChannel.id !== defaultChannelId &&
+        !isProtectedChannel(selectedChannel)
+      ) {
+        await dispatch(removeExistingChannel(selectedChannel.id)).unwrap();
+        toast.success(t("chat.notifications.channelDeleted"));
         setCurrentChannel(defaultChannelId);
         setModalType(null);
       } else {
-        toast.error(t('chat.notifications.protectedChannelDeleteError'));
+        toast.error(t("chat.notifications.protectedChannelDeleteError"));
       }
-    } catch (err) {
-      toast.error(t('chat.notifications.networkError'));
-      console.error(err);
+    } catch {
+      toast.error(t("chat.notifications.networkError"));
     }
   };
 
   const handleRenameChannel = async (newName) => {
     try {
-      if (selectedChannel && !['general', 'random'].includes(selectedChannel.name)) {
+      if (selectedChannel && !isProtectedChannel(selectedChannel)) {
         const cleanedName = leoProfanity.clean(newName);
-        await dispatch(renameChannel({ id: selectedChannel.id, name: cleanedName })).unwrap();
-        toast.success(t('chat.notifications.channelRenamed'));
+        await dispatch(
+          renameExistingChannel({ id: selectedChannel.id, name: cleanedName })
+        ).unwrap();
+        toast.success(t("chat.notifications.channelRenamed"));
         setModalType(null);
       } else {
-        toast.error(t('chat.notifications.protectedChannelRenameError'));
+        toast.error(t("chat.notifications.protectedChannelRenameError"));
       }
-    } catch (err) {
-      toast.error(t('chat.notifications.networkError'));
-      console.error(err);
+    } catch {
+      toast.error(t("chat.notifications.networkError"));
     }
   };
 
   const validationSchema = Yup.object({
     name: Yup.string()
-      .min(3, t('validation.usernameMin'))
-      .max(20, t('validation.usernameMax'))
-      .required(t('signup.validation.required'))
-      .test('unique', t('validation.unique'), (value) =>
-        !channels.some((channel) => channel.name === value)
+      .min(3, t("validation.usernameMin"))
+      .max(20, t("validation.usernameMax"))
+      .required(t("signup.validation.required"))
+      .test(
+        "unique",
+        t("validation.unique"),
+        (value) => !channels.some((channel) => channel.name === value)
       ),
   });
 
@@ -125,52 +138,56 @@ const ChatPage = () => {
       <div className="row">
         <div className="col-md-4 border-end">
           <h4 className="d-flex justify-content-between align-items-center">
-            {t('chat.channels')}
-            <Button variant="primary" onClick={() => setModalType('add')}>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" className="me-1">
-                <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"></path>
-                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
-              </svg>
-              <span className="visually-hidden">+</span>
+            {t("chat.channels")}
+            <Button variant="primary" onClick={() => setModalType("add")}>
+              +
             </Button>
           </h4>
 
-          {status === 'failed' && <p className="text-danger">{t('error')}: {error}</p>}
+          {status === "failed" && (
+            <p className="text-danger">
+              {t("error")}: {error}
+            </p>
+          )}
 
           <ul className="list-group">
             {channels.map((channel) => (
               <li
                 key={channel.id}
-                className={`list-group-item d-flex justify-content-between align-items-center ${currentChannel === channel.id ? 'active text-white' : ''}`}
+                className={`list-group-item d-flex justify-content-between align-items-center ${
+                  currentChannel === channel.id ? "active text-white" : ""
+                }`}
               >
                 <button
                   onClick={() => handleChannelChange(channel.id)}
-                  className={`w-100 rounded-0 text-start text-truncate btn btn-secondary`}
-                  style={{ cursor: 'pointer' }}
+                  className="w-100 rounded-0 text-start btn"
+                  style={{ cursor: "pointer" }}
                 >
                   #{channel.name}
                 </button>
-                {channel.name !== 'general' && channel.name !== 'random' && (
+                {!isProtectedChannel(channel) && (
                   <Dropdown>
                     <Dropdown.Toggle size="sm" variant="secondary">
-                      <span className="visually-hidden">{'Управление каналом'}</span>
+                      <span className="visually-hidden">
+                        {"Управление каналом"}
+                      </span>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                       <Dropdown.Item
                         onClick={() => {
                           setSelectedChannel(channel);
-                          setModalType('rename');
+                          setModalType("rename");
                         }}
                       >
-                        {t('chat.renameChannel')}
+                        {t("chat.renameChannel")}
                       </Dropdown.Item>
                       <Dropdown.Item
                         onClick={() => {
                           setSelectedChannel(channel);
-                          setModalType('delete');
+                          setModalType("delete");
                         }}
                       >
-                        {t('chat.delete')}
+                        {t("chat.delete")}
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
@@ -182,21 +199,27 @@ const ChatPage = () => {
 
         <div className="col-md-8">
           <h4>
-            {t('chat.chatIn')} {currentChannel ? `#${channels.find((ch) => ch.id === currentChannel)?.name}` : ''}
+            {t("chat.chatIn")}{" "}
+            {currentChannel
+              ? `#${channels.find((ch) => ch.id === currentChannel)?.name}`
+              : ""}
           </h4>
 
-          <div className="chat-box border rounded p-3 mb-3" style={{ height: '300px', overflowY: 'scroll' }}>
+          <div
+            className="chat-box border rounded p-3 mb-3"
+            style={{ height: "300px", overflowY: "scroll" }}
+          >
             {messages
-              .filter((msg) => msg.channelId === currentChannel)  // Фильтрация по текущему каналу
+              .filter((msg) => msg.channelId === currentChannel)
               .map((message) => (
                 <div key={message.id} className="mb-2">
-                  <strong>{message.userName}:</strong> {message.body} {/* Используем message.username вместо username */}
+                  <strong>{message.username}:</strong> {message.body}
                 </div>
               ))}
           </div>
 
           <Formik
-            initialValues={{ messageBody: '' }}
+            initialValues={{ messageBody: "" }}
             onSubmit={(values, { resetForm }) => {
               handleSendMessage(values.messageBody);
               resetForm();
@@ -207,11 +230,11 @@ const ChatPage = () => {
                 <Field
                   name="messageBody"
                   aria-label="Новое сообщение"
-                  placeholder={t('chat.newMessage')}
+                  placeholder={t("chat.newMessage")}
                   className="form-control"
                 />
                 <button type="submit" className="btn btn-primary">
-                  {t('chat.send')}
+                  {t("chat.send")}
                 </button>
               </Form>
             )}
@@ -219,37 +242,39 @@ const ChatPage = () => {
         </div>
       </div>
 
-      <Modal show={modalType === 'add'} onHide={() => setModalType(null)}>
+      <Modal show={modalType === "add"} onHide={() => setModalType(null)}>
         <Formik
-          initialValues={{ name: '' }}
+          initialValues={{ name: "" }}
           validationSchema={validationSchema}
           onSubmit={handleAddChannel}
         >
           {({ errors, touched }) => (
             <Form>
               <Modal.Header closeButton>
-                <Modal.Title>{t('chat.addChannel')}</Modal.Title>
+                <Modal.Title>{t("chat.addChannel")}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Field
                   name="name"
                   id="name"
-                  placeholder=""
-                  className={`form-control ${touched.name && errors.name ? 'is-invalid' : touched.name ? 'is-valid' : ''}`}
+                  className={`form-control ${
+                    touched.name && errors.name
+                      ? "is-invalid"
+                      : touched.name
+                      ? "is-valid"
+                      : ""
+                  }`}
                 />
-                <label htmlFor="name" className="visually-hidden">
-                  Имя канала
-                </label>
                 {touched.name && errors.name && (
-                  <div className="invalid-feedback">{t('signup.validation.username')}</div>
+                  <div className="invalid-feedback">{errors.name}</div>
                 )}
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="secondary" onClick={() => setModalType(null)}>
-                  {t('chat.cancel')}
+                  {t("chat.cancel")}
                 </Button>
                 <Button type="submit" variant="primary">
-                  {t('chat.send')}
+                  {t("chat.send")}
                 </Button>
               </Modal.Footer>
             </Form>
@@ -257,50 +282,54 @@ const ChatPage = () => {
         </Formik>
       </Modal>
 
-      <Modal show={modalType === 'delete'} onHide={() => setModalType(null)}>
+      <Modal show={modalType === "delete"} onHide={() => setModalType(null)}>
         <Modal.Header closeButton>
-          <Modal.Title>{t('chat.deleteChannel')}</Modal.Title>
+          <Modal.Title>{t("chat.deleteChannel")}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>{t('chat.confirmDelete')}</Modal.Body>
+        <Modal.Body>{t("chat.confirmDelete")}</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setModalType(null)}>
-            {t('chat.cancel')}
+            {t("chat.cancel")}
           </Button>
           <Button variant="danger" onClick={handleRemoveChannel}>
-            {t('chat.delete')}
+            {t("chat.delete")}
           </Button>
         </Modal.Footer>
       </Modal>
 
-      <Modal show={modalType === 'rename'} onHide={() => setModalType(null)}>
+      <Modal show={modalType === "rename"} onHide={() => setModalType(null)}>
         <Formik
-          initialValues={{ name: selectedChannel?.name || '' }}
+          initialValues={{ name: selectedChannel?.name || "" }}
           validationSchema={validationSchema}
           onSubmit={({ name }) => handleRenameChannel(name)}
         >
           {({ errors, touched }) => (
             <Form>
               <Modal.Header closeButton>
-                <Modal.Title>{t('chat.renameChannel')}</Modal.Title>
+                <Modal.Title>{t("chat.renameChannel")}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Field
                   name="name"
                   id="name"
-                  placeholder={t('chat.newChannelPlaceholder')}
-                  className={`form-control ${touched.name && errors.name ? 'is-invalid' : touched.name ? 'is-valid' : ''}`}
+                  className={`form-control ${
+                    touched.name && errors.name
+                      ? "is-invalid"
+                      : touched.name
+                      ? "is-valid"
+                      : ""
+                  }`}
                 />
-                <label htmlFor="name" className="visually-hidden">{'Имя канала'}</label>
                 {touched.name && errors.name && (
                   <div className="invalid-feedback">{errors.name}</div>
                 )}
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="secondary" onClick={() => setModalType(null)}>
-                  {t('chat.cancel')}
+                  {t("chat.cancel")}
                 </Button>
                 <Button type="submit" variant="primary">
-                  {t('chat.renameChannel')}
+                  {t("chat.renameChannel")}
                 </Button>
               </Modal.Footer>
             </Form>
