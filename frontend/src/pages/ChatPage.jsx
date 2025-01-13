@@ -181,7 +181,7 @@ const ChatPage = () => {
           <Formik initialValues={{ messageBody: "" }} onSubmit={(values, { resetForm }) => { handleSendMessage(values.messageBody); resetForm(); }}>
             {({ handleSubmit }) => (
               <Form className="input-group" onSubmit={handleSubmit}>
-                <Field name="messageBody" placeholder={t("chat.newMessage")} className="form-control" />
+                <Field name="messageBody" aria-label="Новое сообщение" placeholder={t("chat.newMessage")} className="form-control" />
                 <button type="submit" className="btn btn-primary">{t("chat.send")}</button>
               </Form>
             )}
