@@ -70,6 +70,9 @@ const ChatPage = () => {
     </div>
   );
 
+  // eslint-disable-next-line react/prop-types
+  const CustomButton = ({ isActive, handleChannelChange, channel }) => ( <button type="button" className={`w-100 rounded-0 text-start text-truncate btn ${isActive ? "btn-secondary" : ""}`} onClick={() => handleChannelChange(channel.id)} > <span className="me-1">#</span> {channel.name} </button> );
+
   const handleAddChannel = async (values, { resetForm }) => {
     try {
       const cleanedName = leoProfanity.clean(values.name);
@@ -176,7 +179,7 @@ const ChatPage = () => {
                   <Dropdown as="div" className={`btn-group w-100 custom-dropdown ${isActive ? "active" : ""}`}>
                     <Button
                     variant=""
-                    className={`w-100 rounded-0 text-start ${isActive ? "btn-secondary" : "text-truncate"}`}
+                    className={`w-100 rounded-0 text-start ${!isActive ? "text-truncate" : "btn-secondary"}`}
                       onClick={() => handleChannelChange(channel.id)}
                     >
                       <span className="me-1">#</span>
