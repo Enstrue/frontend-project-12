@@ -1,0 +1,41 @@
+/* Общие стили для кнопок */
+.nav-item .btn {
+  background-color: white !important; /* Полностью белый фон */
+  color: black !important; /* Текст черный */
+  border: none !important; /* Убираем обводку */
+  box-shadow: none !important; /* Убираем тень */
+}
+
+/* Стили для активных кнопок */
+.nav-item .btn.btn-secondary {
+  background-color: #6c757d !important; /* Серый цвет фона */
+  color: white !important; /* Белый текст */
+}
+
+/* Стили для группы кнопок с дропдауном */
+.custom-dropdown .btn,
+.custom-dropdown .dropdown-toggle {
+  background-color: white !important;
+  color: black !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Стили для активной группы кнопок с дропдауном */
+.custom-dropdown.active .btn,
+.custom-dropdown.active .dropdown-toggle {
+  background-color: #6c757d !important; /* Серый фон */
+  color: white !important; /* Белый текст */
+}
+
+/* Убираем обводку и тень у выпадающего меню */
+.custom-dropdown .dropdown-menu {
+  box-shadow: none !important;
+}
+
+/* Стили для пунктов выпадающего меню */
+.custom-dropdown .dropdown-item:hover,
+.custom-dropdown .dropdown-item:focus {
+  background-color: #f8f9fa !important; /* Светло-серый фон при наведении */
+  color: black !important; /* Черный текст */
+}
