@@ -72,11 +72,20 @@ const ChatPage = () => {
   const isProtectedChannel = (channel) =>
     ["general", "random"].includes(channel.name);
 
+  // eslint-disable-next-line react/prop-types
+  const CustomToast = ({ message }) => {
+    return (
+      <div>
+        <div>{message}</div>  {/* Это добавит необходимую обертку в <div> */}
+      </div>
+    );
+  };
+  
   const handleAddChannel = async (values, { resetForm }) => {
     try {
       const cleanedName = leoProfanity.clean(values.name);
       await dispatch(addNewChannel(cleanedName)).unwrap();
-      toast.success("Канал создан");
+      toast.success(<CustomToast message={t("chat.notifications.channelCreated")} />);
       resetForm();
       setModalType(null);
     } catch {
@@ -131,6 +140,7 @@ const ChatPage = () => {
         (value) => !channels.some((channel) => channel.name === value)
       ),
   });
+
 
   return (
     <div className="container py-4">
