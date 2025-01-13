@@ -70,15 +70,11 @@ const ChatPage = () => {
     </div>
   );
 
-  // eslint-disable-next-line react/prop-types
-  const CustomButton = ({ isActive, handleChannelChange, channel }) => ( <button type="button" className={`w-100 rounded-0 text-start text-truncate btn ${isActive ? "btn-secondary" : ""}`} onClick={() => handleChannelChange(channel.id)} > <span className="me-1">#</span> {channel.name} </button> );
-
   const handleAddChannel = async (values, { resetForm }) => {
     try {
       const cleanedName = leoProfanity.clean(values.name);
       const newChannel = await dispatch(addNewChannel(cleanedName)).unwrap();
       if (username) {
-        // Переключение только для инициатора
         setCurrentChannel(newChannel.id);
       }
       toast.success(<CustomToast message={t("chat.notifications.channelCreated")} />);
@@ -178,8 +174,10 @@ const ChatPage = () => {
                 <li key={channel.id} className="nav-item w-100">
                   <Dropdown as="div" className={`btn-group w-100 custom-dropdown ${isActive ? "active" : ""}`}>
                     <Button
-                    variant=""
-                    className={`w-100 rounded-0 text-start ${!isActive ? "text-truncate" : "btn-secondary"}`}
+                      variant=""
+                      className={`w-100 rounded-0 text-start text-truncate ${
+                        isActive ? "btn-secondary" : ""
+                      }`}
                       onClick={() => handleChannelChange(channel.id)}
                     >
                       <span className="me-1">#</span>
