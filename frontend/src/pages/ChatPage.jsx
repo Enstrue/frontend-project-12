@@ -198,7 +198,7 @@ const ChatPage = () => {
                         {t("chat.renameChannel")}
                       </Dropdown.Item>
                       <Dropdown.Item onClick={() => {
-                        setModalType("rename");
+                        setModalType("delete");
                         setSelectedChannel(channel);
                       }}>
                         {t("chat.delete")}
