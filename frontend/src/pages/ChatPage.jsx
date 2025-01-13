@@ -174,8 +174,8 @@ const ChatPage = () => {
                 <li key={channel.id} className="nav-item w-100">
                   <Dropdown as="div" className={`btn-group w-100 custom-dropdown ${isActive ? "active" : ""}`}>
                     <Button
-                      variant="light"
-                      className={`w-100 rounded-0 text-start text-truncate ${
+                    variant=""
+                      className={`w-100 rounded-0 text-start text-truncate btn ${
                         isActive ? "btn-secondary" : ""
                       }`}
                       onClick={() => handleChannelChange(channel.id)}
