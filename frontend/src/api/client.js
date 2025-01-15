@@ -6,15 +6,16 @@ apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     // Создаем новый объект с обновленными заголовками
-    config = { 
+    const newConfig = {
       ...config,
       headers: {
         ...config.headers,
         Authorization: `Bearer ${token}`,
       },
     };
+    return newConfig;
   }
-  return config;
+  return config;  // Возвращаем оригинальный config, если нет токена
 });
 
 export default apiClient;

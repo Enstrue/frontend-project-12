@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
-import apiClient from '../api/client';
 import { useAuth } from '../contexts/AuthCont';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux'; // Импортируем useDispatch
 import { setUser } from '../store/userSlice'; // Импортируем экшен для обновления имени пользователя в Redux
+import apiClient from '../api/client';
 
 const LoginPage = () => {
   const [generalError, setGeneralError] = useState('');
@@ -39,7 +39,7 @@ const LoginPage = () => {
 
       // Сохраняем токен в локальное хранилище и обновляем состояние авторизации через контекст
       login(response.data.token);
-      dispatch(setUser({ username: values.username }));  // Сохраняем имя пользователя в Redux
+      dispatch(setUser({ username: values.username })); // Сохраняем имя пользователя в Redux
       resetForm();
 
       // Перенаправляем пользователя на страницу чата
@@ -117,7 +117,8 @@ const LoginPage = () => {
 
         {/* Ссылка на страницу регистрации */}
         <p className="mt-3 text-center">
-          {t('login.noAccount')}{' '}
+          {t('login.noAccount')}
+          {' '}
           <Link to="/signup" className="text-decoration-none">
             {t('login.signup')}
           </Link>

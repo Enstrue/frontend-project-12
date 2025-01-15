@@ -1,19 +1,19 @@
-import { useEffect, useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import leoProfanity from "leo-profanity";
+import { useEffect, useState, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import leoProfanity from 'leo-profanity';
 import {
   fetchChatData,
   sendMessage,
   addNewChannel,
   removeExistingChannel,
   renameExistingChannel,
-} from "../store/chatSlice";
-import { Modal, Button, Dropdown } from "react-bootstrap";
-import { useTranslation } from "react-i18next";
+} from '../store/chatSlice';
+import { Modal, Button, Dropdown } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 const ChatPage = () => {
   const { t } = useTranslation();
@@ -21,24 +21,24 @@ const ChatPage = () => {
   const username = useSelector((state) => state.user.username);
   const { channels, messages, status, error } = useSelector((state) => state.chat);
 
-  const [currentChannel, setCurrentChannel] = useState("");
+  const [currentChannel, setCurrentChannel] = useState('');
   const [modalType, setModalType] = useState(null);
   const [selectedChannel, setSelectedChannel] = useState(null);
-  const defaultChannelId = channels[0]?.id || "";
+  const defaultChannelId = channels[0]?.id || '';
   const isInitialRender = useRef(true);
 
   useEffect(() => {
-    leoProfanity.loadDictionary("ru");
-    leoProfanity.loadDictionary("en");
+    leoProfanity.loadDictionary('ru');
+    leoProfanity.loadDictionary('en');
     dispatch(fetchChatData())
       .then(() => {
         if (channels.length > 0 && isInitialRender.current) {
-          setCurrentChannel(channels.find((channel) => channel.name === "general")?.id || defaultChannelId);
+          setCurrentChannel(channels.find((channel) => channel.name === 'general')?.id || defaultChannelId);
           isInitialRender.current = false;
         }
       })
       .catch(() => {
-        toast.error(t("chat.notifications.fetchError"));
+        toast.error(t('chat.notifications.fetchError'));
       });
   }, [dispatch, t, channels, defaultChannelId]);
 
@@ -56,12 +56,12 @@ const ChatPage = () => {
         timestamp: new Date().toISOString(),
       }))
       .catch(() => {
-        toast.error(t("chat.notifications.networkError"));
+        toast.error(t('chat.notifications.networkError'));
       });
     }
   };
 
-  const isProtectedChannel = (channel) => ["general", "random"].includes(channel.name);
+  const isProtectedChannel = (channel) => ['general', 'random'].includes(channel.name);
 
   // eslint-disable-next-line react/prop-types
   const CustomToast = ({ message }) => (
@@ -77,11 +77,11 @@ const ChatPage = () => {
       if (username) {
         setCurrentChannel(newChannel.id);
       }
-      toast.success(<CustomToast message={t("chat.notifications.channelCreated")} />);
+      toast.success(<CustomToast message={t('chat.notifications.channelCreated')} />);
       resetForm();
       setModalType(null);
     } catch {
-      toast.error(t("chat.notifications.networkError"));
+      toast.error(t('chat.notifications.networkError'));
     }
   };
 
@@ -89,14 +89,14 @@ const ChatPage = () => {
     try {
       if (selectedChannel && selectedChannel.id !== defaultChannelId && !isProtectedChannel(selectedChannel)) {
         await dispatch(removeExistingChannel(selectedChannel.id)).unwrap();
-        toast.success(t("chat.notifications.channelDeleted"));
+        toast.success(t('chat.notifications.channelDeleted'));
         setCurrentChannel(defaultChannelId);
         setModalType(null);
       } else {
-        toast.error(t("chat.notifications.protectedChannelDeleteError"));
+        toast.error(t('chat.notifications.protectedChannelDeleteError'));
       }
     } catch {
-      toast.error(t("chat.notifications.networkError"));
+      toast.error(t('chat.notifications.networkError'));
     }
   };
 
@@ -105,22 +105,22 @@ const ChatPage = () => {
       if (selectedChannel && !isProtectedChannel(selectedChannel)) {
         const cleanedName = leoProfanity.clean(newName);
         await dispatch(renameExistingChannel({ id: selectedChannel.id, name: cleanedName })).unwrap();
-        toast.success(t("chat.notifications.channelRenamed"));
+        toast.success(t('chat.notifications.channelRenamed'));
         setModalType(null);
       } else {
-        toast.error(t("chat.notifications.protectedChannelRenameError"));
+        toast.error(t('chat.notifications.protectedChannelRenameError'));
       }
     } catch {
-      toast.error(t("chat.notifications.networkError"));
+      toast.error(t('chat.notifications.networkError'));
     }
   };
 
   const validationSchema = Yup.object({
     name: Yup.string()
-      .min(3, t("validation.username"))
-      .max(20, t("validation.username"))
-      .required(t("signup.validation.required"))
-      .test("unique", t("validation.unique"), (value) => !channels.some((channel) => channel.name === value)),
+      .min(3, t('validation.username'))
+      .max(20, t('validation.username'))
+      .required(t('signup.validation.required'))
+      .test('unique', t('validation.unique'), (value) => !channels.some((channel) => channel.name === value)),
   });
 
   return (
@@ -130,18 +130,17 @@ const ChatPage = () => {
         {/* Left side - Channel list */}
         <div className="col-md-4 border-end">
           <h4 className="d-flex justify-content-between align-items-center">
-            {t("chat.channels")}
-          <button type="button" className="p-0 text-primary btn btn-group-vertical" onClick={() => setModalType('add')}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor">
-              <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"></path>
-              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
-            </svg>
-            <span className="visually-hidden">+</span>
-          </button>
-
+            {t('chat.channels')}
+            <button type="button" className="p-0 text-primary btn btn-group-vertical" onClick={() => setModalType('add')}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor">
+                <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"></path>
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
+              </svg>
+              <span className="visually-hidden">+</span>
+            </button>
           </h4>
-          {status === "failed" && (
-            <p className="text-danger">{t("error")}: {error}</p>
+          {status === 'failed' && (
+            <p className="text-danger">{t('error')}: {error}</p>
           )}
           <ul
             id="channels-box"
@@ -158,9 +157,7 @@ const ChatPage = () => {
                     <button
                       type="button"
                       onClick={() => handleChannelChange(channel.id)}
-                      className={`w-100 rounded-0 text-start btn ${
-                        isActive ? "btn-secondary" : ""
-                      }`}
+                      className={`w-100 rounded-0 text-start btn ${isActive ? 'btn-secondary' : ''}`}
                     >
                       <span className="me-1">#</span>
                       {channel.name}
@@ -172,9 +169,9 @@ const ChatPage = () => {
               // Кнопка с дропдауном
               return (
                 <li key={channel.id} className="nav-item w-100">
-                  <Dropdown as="div" className={`btn-group w-100 custom-dropdown ${isActive ? "active" : ""}`}>
+                  <Dropdown as="div" className={`btn-group w-100 custom-dropdown ${isActive ? 'active' : ''}`}>
                     <button
-                      className={`w-100 rounded-0 text-start text-truncate ${ isActive ? "btn btn-secondary" : "btn" }`}
+                      className={`w-100 rounded-0 text-start text-truncate ${ isActive ? 'btn btn-secondary' : 'btn' }`}
                       onClick={() => handleChannelChange(channel.id)}
                     >
                       <span className="me-1">#</span>
@@ -182,23 +179,23 @@ const ChatPage = () => {
                     </button>
                     <Dropdown.Toggle
                       split
-                      variant={isActive ? "secondary" : "light"}
+                      variant={isActive ? 'secondary' : 'light'}
                       id={`dropdown-split-${channel.id}`}
                     >
                       <span className="visually-hidden">Управление каналом</span>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                       <Dropdown.Item onClick={() => {
-                        setModalType("rename");
+                        setModalType('rename');
                         setSelectedChannel(channel);
                       }}>
-                        {t("chat.renameChannel")}
+                        {t('chat.renameChannel')}
                       </Dropdown.Item>
                       <Dropdown.Item onClick={() => {
-                        setModalType("delete");
+                        setModalType('delete');
                         setSelectedChannel(channel);
                       }}>
-                        {t("chat.delete")}
+                        {t('chat.delete')}
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
@@ -206,24 +203,23 @@ const ChatPage = () => {
               );
             })}
           </ul>
-
         </div>
 
         {/* Right side - Messages and input */}
         <div className="col-md-8">
-          <h4>{t("chat.chatIn")} #{channels.find((ch) => ch.id === currentChannel)?.name}</h4>
-          <div className="chat-box border rounded p-3 mb-3" style={{ height: "300px", overflowY: "scroll" }}>
+          <h4>{t('chat.chatIn')} #{channels.find((ch) => ch.id === currentChannel)?.name}</h4>
+          <div className="chat-box border rounded p-3 mb-3" style={{ height: '300px', overflowY: 'scroll' }}>
             {messages.filter((msg) => msg.channelId === currentChannel).map((message) => (
               <div key={message.id} className="mb-2">
                 <strong>{message.username}:</strong> {message.body}
               </div>
             ))}
           </div>
-          <Formik initialValues={{ messageBody: "" }} onSubmit={(values, { resetForm }) => { handleSendMessage(values.messageBody); resetForm(); }}>
+          <Formik initialValues={{ messageBody: '' }} onSubmit={(values, { resetForm }) => { handleSendMessage(values.messageBody); resetForm(); }}>
             {({ handleSubmit }) => (
               <Form className="input-group" onSubmit={handleSubmit}>
-                <Field name="messageBody" aria-label="Новое сообщение" placeholder={t("chat.newMessage")} className="form-control" />
-                <button type="submit" className="btn btn-primary">{t("chat.send")}</button>
+                <Field name="messageBody" aria-label="Новое сообщение" placeholder={t('chat.newMessage')} className="form-control" />
+                <button type="submit" className="btn btn-primary">{t('chat.send')}</button>
               </Form>
             )}
           </Formik>
@@ -231,27 +227,27 @@ const ChatPage = () => {
       </div>
 
       {/* Modals for Add, Delete, and Rename Channels */}
-      <Modal show={modalType === "add"} onHide={() => setModalType(null)}>
-        <Formik initialValues={{ name: "" }} validationSchema={validationSchema} onSubmit={handleAddChannel}>
+      <Modal show={modalType === 'add'} onHide={() => setModalType(null)}>
+        <Formik initialValues={{ name: '' }} validationSchema={validationSchema} onSubmit={handleAddChannel}>
           {({ errors, touched }) => (
             <Form>
               <Modal.Header closeButton>
-                <Modal.Title>{t("chat.addChannel")}</Modal.Title>
+                <Modal.Title>{t('chat.addChannel')}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Field
                   name="name"
                   id="name"
-                  className={`form-control ${touched.name && errors.name ? "is-invalid" : touched.name ? "is-valid" : ""}`}
+                  className={`form-control ${touched.name && errors.name ? 'is-invalid' : touched.name ? 'is-valid' : ''}`}
                 />
                 <label htmlFor="name" className="visually-hidden">
-                  {"Имя канала"}
+                  {'Имя канала'}
                 </label>
                 {touched.name && errors.name && <div className="invalid-feedback">{errors.name}</div>}
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={() => setModalType(null)}>{t("chat.cancel")}</Button>
-                <Button type="submit" variant="primary">{t("chat.send")}</Button>
+                <Button variant="secondary" onClick={() => setModalType(null)}>{t('chat.cancel')}</Button>
+                <Button type="submit" variant="primary">{t('chat.send')}</Button>
               </Modal.Footer>
             </Form>
           )}
@@ -259,39 +255,39 @@ const ChatPage = () => {
       </Modal>
 
       {/* Modal for Deleting Channel */}
-      <Modal show={modalType === "delete"} onHide={() => setModalType(null)}>
+      <Modal show={modalType === 'delete'} onHide={() => setModalType(null)}>
         <Modal.Header closeButton>
-          <Modal.Title>{t("chat.deleteChannel")}</Modal.Title>
+          <Modal.Title>{t('chat.deleteChannel')}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>{t("chat.confirmDelete")}</Modal.Body>
+        <Modal.Body>{t('chat.confirmDelete')}</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setModalType(null)}>{t("chat.cancel")}</Button>
-          <Button variant="danger" onClick={handleRemoveChannel}>{t("chat.delete")}</Button>
+          <Button variant="secondary" onClick={() => setModalType(null)}>{t('chat.cancel')}</Button>
+          <Button variant="danger" onClick={handleRemoveChannel}>{t('chat.delete')}</Button>
         </Modal.Footer>
       </Modal>
 
       {/* Modal for Renaming Channel */}
-      <Modal show={modalType === "rename"} onHide={() => setModalType(null)}>
-        <Formik initialValues={{ name: selectedChannel?.name || "" }} validationSchema={validationSchema} onSubmit={({ name }) => handleRenameChannel(name)}>
+      <Modal show={modalType === 'rename'} onHide={() => setModalType(null)}>
+        <Formik initialValues={{ name: selectedChannel?.name || '' }} validationSchema={validationSchema} onSubmit={({ name }) => handleRenameChannel(name)}>
           {({ errors, touched }) => (
             <Form>
               <Modal.Header closeButton>
-                <Modal.Title>{t("chat.renameChannel")}</Modal.Title>
+                <Modal.Title>{t('chat.renameChannel')}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Field
                   name="name"
                   id="name"
-                  className={`form-control ${touched.name && errors.name ? "is-invalid" : touched.name ? "is-valid" : ""}`}
+                  className={`form-control ${touched.name && errors.name ? 'is-invalid' : touched.name ? 'is-valid' : ''}`}
                 />
                 <label htmlFor="name" className="visually-hidden">
-                  {"Имя канала"}
+                  {'Имя канала'}
                 </label>
                 {touched.name && errors.name && <div className="invalid-feedback">{errors.name}</div>}
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={() => setModalType(null)}>{t("chat.cancel")}</Button>
-                <Button type="submit" variant="primary">{t("chat.renameChannel")}</Button>
+                <Button variant="secondary" onClick={() => setModalType(null)}>{t('chat.cancel')}</Button>
+                <Button type="submit" variant="primary">{t('chat.renameChannel')}</Button>
               </Modal.Footer>
             </Form>
           )}

@@ -5,7 +5,7 @@ const resources = {
   ru: {
     translation: {
       header: {
-        brand: 'Hexlet Chat',  // Используем одинарные кавычки
+        brand: 'Hexlet Chat',
         logout: 'Выйти',
       },
       login: {
