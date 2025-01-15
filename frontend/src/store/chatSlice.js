@@ -118,6 +118,5 @@ const chatSlice = createSlice({
   },
 });
 
-// Экспортируем actions и редуктор
 export const { addMessage, addChannel, removeChannel, renameChannel } = chatSlice.actions;
 export default chatSlice.reducer;

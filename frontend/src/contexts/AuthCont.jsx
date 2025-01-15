@@ -3,7 +3,7 @@ import {
   useContext,
   useState,
   useEffect,
-  useMemo
+  useMemo,
 } from 'react';
 
 const AuthContext = createContext();

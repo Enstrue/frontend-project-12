@@ -1,5 +1,10 @@
 import socket from '../../api/socket';
-import { addMessage, addChannel, removeChannel, renameChannel } from '../chatSlice';
+import {
+  addMessage,
+  addChannel,
+  removeChannel,
+  renameChannel
+} from '../chatSlice';
 
 const socketMiddleware = (storeAPI) => (next) => (action) => {
   if (socket.listeners('newMessage').length === 0) {
