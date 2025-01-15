@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 
 const AuthContext = createContext();
 
@@ -20,8 +20,11 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(!!localStorage.getItem('token'));
   }, []);
 
+  // Использование useMemo для предотвращения пересоздания объекта контекста
+  const value = useMemo(() => ({ isAuthenticated, login, logout }), [isAuthenticated]);
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
@@ -29,4 +32,3 @@ export const AuthProvider = ({ children }) => {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
-
