@@ -27,15 +27,14 @@ export const fetchChatData = createAsyncThunk('chat/fetchData', async () => {
 export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ channelId, body, username }) => {
   const token = localStorage.getItem('token');
   const response = await apiClient.post(
-    `/api/v1/messages`,
-    { body, channelId, username }, // Здесь ключ `username`
+    '/api/v1/messages',
+    { body, channelId, username },
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
   socket.emit('sendMessage', { channelId, body, username });
   return response.data;
 });
-
 
 export const addNewChannel = createAsyncThunk('chat/addChannel', async (name) => {
   const token = localStorage.getItem('token');

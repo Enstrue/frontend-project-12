@@ -1,10 +1,10 @@
-import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import apiClient from '../api/client';
-import { useAuth } from '../contexts/AuthCont';
-import { useTranslation } from 'react-i18next';
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useAuth } from "../contexts/AuthCont";
+import { useTranslation } from "react-i18next";
+import apiClient from "../api/client";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -13,13 +13,13 @@ const SignupPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/chat');
+      navigate("/chat");
     }
   }, [isAuthenticated, navigate]);
 
   const handleSignup = async (values, { setErrors }) => {
     try {
-      const response = await apiClient.post('/api/v1/signup', {
+      const response = await apiClient.post("/api/v1/signup", {
         username: values.username,
         password: values.password,
       });
@@ -29,31 +29,36 @@ const SignupPage = () => {
       }
     } catch (error) {
       if (error.response?.status === 409) {
-        setErrors({ username: 'Такой пользователь уже существует' });
+        setErrors({ username: "Такой пользователь уже существует" });
       } else {
-        setErrors({ username: 'Ошибка регистрации. Попробуйте позже.' });
+        setErrors({ username: "Ошибка регистрации. Попробуйте позже." });
       }
     }
   };
 
   const validationSchema = Yup.object({
     username: Yup.string()
-      .min(3, t('signup.validation.username'))
-      .max(20, t('signup.validation.username'))
-      .required(t('signup.validation.required')),
-    password: Yup.string().min(6, t('signup.validation.password')).required(t('signup.validation.required')),
+      .min(3, t("signup.validation.username"))
+      .max(20, t("signup.validation.username"))
+      .required(t("signup.validation.required")),
+    password: Yup.string()
+      .min(6, t("signup.validation.password"))
+      .required(t("signup.validation.required")),
     confirmPassword: Yup.string()
-      .oneOf([Yup.ref('password')], t('signup.validation.confirmPassword'))
-      .required(t('signup.validation.required')),
+      .oneOf([Yup.ref("password")], t("signup.validation.confirmPassword"))
+      .required(t("signup.validation.required")),
   });
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
-      <div className="p-4 bg-light rounded shadow" style={{ maxWidth: '400px', width: '100%' }}>
+      <div
+        className="p-4 bg-light rounded shadow"
+        style={{ maxWidth: "400px", width: "100%" }}
+      >
         <h2>Регистрация в Hexlet Chat</h2>
 
         <Formik
-          initialValues={{ username: '', password: '', confirmPassword: '' }}
+          initialValues={{ username: "", password: "", confirmPassword: "" }}
           validationSchema={validationSchema}
           onSubmit={handleSignup}
         >
@@ -66,15 +71,15 @@ const SignupPage = () => {
                   id="username"
                   autoComplete="username"
                   placeholder="От 3 до 20 символов"
-                  className={`form-control ${touched.username && errors.username ? 'is-invalid' : ''}`}
+                  className={`form-control ${
+                    touched.username && errors.username ? "is-invalid" : ""
+                  }`}
                 />
                 <label htmlFor="username" className="form-label">
                   Имя пользователя
                 </label>
                 {touched.username && errors.username && (
-                  <div className="invalid-tooltip">
-                    {errors.username}
-                  </div>
+                  <div className="invalid-tooltip">{errors.username}</div>
                 )}
               </div>
 
@@ -86,15 +91,15 @@ const SignupPage = () => {
                   type="password"
                   autoComplete="new-password"
                   placeholder="Не менее 6 символов"
-                  className={`form-control ${touched.password && errors.password ? 'is-invalid' : ''}`}
+                  className={`form-control ${
+                    touched.password && errors.password ? "is-invalid" : ""
+                  }`}
                 />
                 <label htmlFor="password" className="form-label">
                   Пароль
                 </label>
                 {touched.password && errors.password && (
-                  <div className="invalid-tooltip">
-                    {errors.password}
-                  </div>
+                  <div className="invalid-tooltip">{errors.password}</div>
                 )}
               </div>
 
@@ -106,7 +111,11 @@ const SignupPage = () => {
                   type="password"
                   autoComplete="new-password"
                   placeholder="Пароли должны совпадать"
-                  className={`form-control ${touched.confirmPassword && errors.confirmPassword ? 'is-invalid' : ''}`}
+                  className={`form-control ${
+                    touched.confirmPassword && errors.confirmPassword
+                      ? "is-invalid"
+                      : ""
+                  }`}
                 />
                 <label htmlFor="confirmPassword" className="form-label">
                   Подтвердите пароль

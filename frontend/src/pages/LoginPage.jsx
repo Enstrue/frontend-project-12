@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthCont';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux'; // Импортируем useDispatch
 import { setUser } from '../store/userSlice'; // Импортируем экшен для обновления имени пользователя в Redux
 import apiClient from '../api/client';
+import { useAuth } from '../contexts/AuthCont';
 
 const LoginPage = () => {
   const [generalError, setGeneralError] = useState('');
