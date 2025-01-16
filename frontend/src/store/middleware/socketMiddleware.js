@@ -3,7 +3,7 @@ import {
   addMessage,
   addChannel,
   removeChannel,
-  renameChannel
+  renameChannel,
 } from '../chatSlice';
 
 const socketMiddleware = (storeAPI) => (next) => (action) => {

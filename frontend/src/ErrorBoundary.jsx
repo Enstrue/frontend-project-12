@@ -1,42 +1,43 @@
 import React from 'react';
-import Rollbar from 'rollbar';
+import { ErrorBoundary } from 'react-error-boundary';
 import PropTypes from 'prop-types';
+import Rollbar from 'rollbar'; // Исправлено: добавлен импорт Rollbar
 
 const rollbar = new Rollbar({
-  accessToken: '5c280bb4326d4c0ab97160c54e00cf37',
+  accessToken: '5c280bb4326d4c0ab97160c54e00cf37', // Замените токен на актуальный
   environment: 'production',
   captureUncaught: true,
   captureUnhandledRejections: true,
 });
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
+const ErrorFallback = ({ error, resetErrorBoundary }) => (
+  <div role="alert">
+    <p>Something went wrong:</p>
+    <pre>{error.message}</pre>
+    <button type="button" onClick={resetErrorBoundary}>
+      Try again
+    </button>
+  </div>
+);
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
+ErrorFallback.propTypes = {
+  error: PropTypes.instanceOf(Error).isRequired,
+  resetErrorBoundary: PropTypes.func.isRequired,
+};
 
-  componentDidCatch(error, errorInfo) {
-    rollbar.error('Error caught by ErrorBoundary', error, { errorInfo });
-  }
+const FunctionalErrorBoundary = ({ children }) => (
+  <ErrorBoundary
+    FallbackComponent={ErrorFallback}
+    onError={(error, errorInfo) => {
+      rollbar.error('Error caught by FunctionalErrorBoundary', error, { errorInfo });
+    }}
+  >
+    {children}
+  </ErrorBoundary>
+);
 
-  render() {
-    const { hasError } = this.state;
-    const { children } = this.props;
-
-    if (hasError) {
-      return <h1>Something went wrong.</h1>;
-    }
-
-    return children;
-  }
-}
-
-ErrorBoundary.propTypes = {
+FunctionalErrorBoundary.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default ErrorBoundary;
+export default FunctionalErrorBoundary;

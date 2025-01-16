@@ -7,13 +7,15 @@ export const fetchChatData = createAsyncThunk('chat/fetchData', async () => {
   const token = localStorage.getItem('token');
 
   try {
-    const channelsResponse = await apiClient.get('/api/v1/channels', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const channelsResponse = await apiClient.get(
+      '/api/v1/channels',
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
 
-    const messagesResponse = await apiClient.get('/api/v1/messages', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const messagesResponse = await apiClient.get(
+      '/api/v1/messages',
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
 
     return {
       channels: channelsResponse.data,
@@ -29,7 +31,7 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ channel
   const response = await apiClient.post(
     '/api/v1/messages',
     { body, channelId, username },
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` } },
   );
 
   socket.emit('sendMessage', { channelId, body, username });
@@ -41,7 +43,7 @@ export const addNewChannel = createAsyncThunk('chat/addChannel', async (name) =>
   const response = await apiClient.post(
     '/api/v1/channels',
     { name },
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` } },
   );
 
   socket.emit('createChannel', { name });
@@ -65,7 +67,7 @@ export const renameExistingChannel = createAsyncThunk('chat/renameChannel', asyn
   const response = await apiClient.patch(
     `/api/v1/channels/${id}`,
     { name },
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` } },
   );
 
   socket.emit('renameChannel', { id, name });
@@ -85,38 +87,62 @@ const chatSlice = createSlice({
   },
   reducers: {
     addMessage(state, action) {
-      state.messages.push(action.payload);
+      return {
+        ...state,
+        messages: [...state.messages, action.payload], // Создаем новый массив
+      };
     },
     addChannel(state, action) {
-      state.channels.push(action.payload);
+      return {
+        ...state,
+        channels: [...state.channels, action.payload], // Создаем новый массив
+      };
     },
     removeChannel(state, action) {
-      state.channels = state.channels.filter((channel) => channel.id !== action.payload.id);
-      state.messages = state.messages.filter((msg) => msg.channelId !== action.payload.id);
+      return {
+        ...state,
+        channels: state.channels.filter(
+          (channel) => channel.id !== action.payload.id,
+        ),
+        messages: state.messages.filter(
+          (msg) => msg.channelId !== action.payload.id,
+        ),
+      };
     },
     renameChannel(state, action) {
       const index = state.channels.findIndex((channel) => channel.id === action.payload.id);
       if (index !== -1) {
-        state.channels[index] = action.payload;
+        const updatedChannels = [...state.channels]; // Создаем новый массив
+        updatedChannels[index] = action.payload;
+        return {
+          ...state,
+          channels: updatedChannels, // Обновляем каналы с новым массивом
+        };
       }
+      return state;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchChatData.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchChatData.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.channels = action.payload.channels;
-        state.messages = action.payload.messages;
-      })
-      .addCase(fetchChatData.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-      });
+      .addCase(fetchChatData.pending, (state) => ({
+        ...state,
+        status: 'loading',
+      }))
+      .addCase(fetchChatData.fulfilled, (state, action) => ({
+        ...state,
+        status: 'succeeded',
+        channels: action.payload.channels,
+        messages: action.payload.messages,
+      }))
+      .addCase(fetchChatData.rejected, (state, action) => ({
+        ...state,
+        status: 'failed',
+        error: action.error.message,
+      }));
   },
 });
 
-export const { addMessage, addChannel, removeChannel, renameChannel } = chatSlice.actions;
+export const {
+  addMessage, addChannel, removeChannel, renameChannel,
+} = chatSlice.actions;
 export default chatSlice.reducer;

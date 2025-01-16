@@ -18,9 +18,7 @@
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
     "chat-server": "^0.0.3",
-    "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.14",
+    "classnames": "^2.5.1",
     "formik": "^2.4.6",
     "globals": "^15.12.0",
     "i18next": "^24.2.0",
@@ -33,6 +31,7 @@
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.6",
     "react-dom": "^18.3.1",
+    "react-error-boundary": "^5.0.0",
     "react-i18next": "^15.2.0",
     "react-modal": "^3.16.1",
     "react-redux": "^9.1.2",
@@ -47,7 +46,12 @@
     "@types/node": "^22.10.5",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "eslint": "^9.15.0",
-    "eslint-plugin-functional": "^7.2.1"
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-functional": "^6.6.3",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^4.6.2"
   }
 }
