@@ -319,11 +319,10 @@ const ChatPage = () => {
                     'is-invalid': touched.name && errors.name,
                     'is-valid': touched.name && !errors.name,
                   })}
-                >
-                  <label htmlFor="name" className="visually-hidden">
-                    Имя канала
-                  </label>
-                </Field>
+                />
+                <label htmlFor="name" className="visually-hidden">
+                  Имя канала
+                </label>
                 {touched.name && errors.name && <div className="invalid-feedback">{errors.name}</div>}
               </Modal.Body>
               <Modal.Footer>
