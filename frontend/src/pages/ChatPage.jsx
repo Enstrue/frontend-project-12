@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import leoProfanity from 'leo-profanity';
-import { Modal, Button, Dropdown } from 'react-bootstrap';
+import { Modal, Button, Dropdown, Spinner } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import {
@@ -36,6 +36,35 @@ const ChatPage = () => {
   const defaultChannelId = channels[0]?.id || '';
   const isInitialRender = useRef(true);
 
+  // Добавляем рефы для прокрутки
+  const messagesBoxRef = useRef(null);
+  const channelsBoxRef = useRef(null);
+
+  // Состояние для отслеживания прокрутки
+  const isUserScrollingMessages = useRef(false);
+  const isUserScrollingChannels = useRef({});
+  const lastScrollTopMessages = useRef(0); // Для сообщений
+  const lastScrollTopChannels = useRef({}); // Для каналов
+
+  // Обработчик прокрутки для сообщений
+  const handleScrollMessages = () => {
+    if (messagesBoxRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = messagesBoxRef.current;
+      isUserScrollingMessages.current = scrollTop < scrollHeight - clientHeight - 10;
+      lastScrollTopMessages.current = scrollTop;
+    }
+  };
+
+  // Обработчик прокрутки для каналов
+  const handleScrollChannels = (channelId) => {
+    const channelRef = channelsBoxRef.current[channelId];
+    if (channelRef) {
+      const { scrollTop, scrollHeight, clientHeight } = channelRef;
+      isUserScrollingChannels.current[channelId] = scrollTop < scrollHeight - clientHeight - 10;
+      lastScrollTopChannels.current[channelId] = scrollTop;
+    }
+  };
+
   useEffect(() => {
     leoProfanity.loadDictionary('ru');
     leoProfanity.loadDictionary('en');
@@ -50,6 +79,33 @@ const ChatPage = () => {
         toast.error(t('chat.notifications.fetchError'));
       });
   }, [dispatch, t, channels, defaultChannelId]);
+
+  useEffect(() => {
+    // Прокручиваем в самый низ, если пользователь не прокручивает вручную (для сообщений)
+    if (!isUserScrollingMessages.current && messagesBoxRef.current) {
+      const { scrollHeight, clientHeight } = messagesBoxRef.current;
+      messagesBoxRef.current.scrollTop = scrollHeight - clientHeight; // Прокручиваем в самый низ
+    }
+  }, [messages, currentChannel]);
+
+  // Прокручиваем канал в самый низ, если пользователь не прокручивает вручную
+  useEffect(() => {
+    if (channelsBoxRef.current && !isUserScrollingChannels.current[currentChannel]) {
+      const channelRef = channelsBoxRef.current[currentChannel];
+      if (channelRef) {
+        const { scrollHeight, clientHeight } = channelRef;
+        channelRef.scrollTop = scrollHeight - clientHeight; // Прокручиваем в самый низ
+      }
+    }
+  }, [channels, currentChannel]);
+
+  useEffect(() => {
+    // Прокручиваем в самый низ при смене канала
+    if (messagesBoxRef.current) {
+      const { scrollHeight, clientHeight } = messagesBoxRef.current;
+      messagesBoxRef.current.scrollTop = scrollHeight - clientHeight; // Прокручиваем в самый низ
+    }
+  }, [currentChannel]);
 
   const handleChannelChange = (channelId) => {
     setCurrentChannel(channelId);
@@ -137,26 +193,42 @@ const ChatPage = () => {
       .test('unique', t('validation.unique'), (value) => !channels.some((channel) => channel.name === value)),
   });
 
+  // // Если статус "loading", отображаем спиннер
+  // if (status === 'loading') {
+  //   return (
+  //     <div className="d-flex justify-content-center align-items-center w-100 h-100">
+  //       <Spinner animation="border" variant="primary" />
+  //     </div>
+  //   );
+  // }
+
   return (
-    <div className="container py-4">
-      <ToastContainer position="top-right" autoClose={3000000} />
-      <div className="row">
+    <div className="container h-100 overflow-hidden">
+      <ToastContainer position="top-right" autoClose={300} />
+      <div className="row h-100 bg-white flex-md-row">
         {/* Left side - Channel list */}
-        <div className="col-md-4 border-end">
-          <h4 className="d-flex justify-content-between align-items-center">
-            {t('chat.channels')}
+        <div className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
+          <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
+            <b>Каналы</b>
             <button
               type="button"
               className="p-0 text-primary btn btn-group-vertical"
               onClick={() => setModalType('add')}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                width="20"
+                height="20"
+                fill="currentColor"
+              >
                 <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
               </svg>
               <span className="visually-hidden">+</span>
             </button>
-          </h4>
+          </div>
+
           {status === 'failed' && (
             <p className="text-danger">
               {t('error')}
@@ -166,6 +238,8 @@ const ChatPage = () => {
             </p>
           )}
           <ul
+            ref={channelsBoxRef} // Добавляем реф для каналов
+            onScroll={handleScrollChannels} // Слушаем прокрутку
             id="channels-box"
             className="nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
           >
@@ -229,34 +303,78 @@ const ChatPage = () => {
           </ul>
         </div>
 
-        {/* Right side - Messages and input */}
-        <div className="col-md-8">
-          <h4>
-            {t('chat.chatIn')}
-            {' '}
-            #
-            {channels.find((ch) => ch.id === currentChannel)?.name}
-          </h4>
-          <div className="chat-box border rounded p-3 mb-3" style={{ height: '300px', overflowY: 'scroll' }}>
-            {messages.filter((msg) => msg.channelId === currentChannel).map((message) => (
-              <div key={message.id} className="mb-2">
-                <strong>
-                  {message.username}
-                  :
-                </strong>
-                {' '}
-                {message.body}
-              </div>
-            ))}
+        {/* Правая панель - Сообщения и ввод */}
+        <div className="col p-0 h-100">
+          <div className="d-flex flex-column h-100">
+            <div className="bg-light mb-4 p-3 shadow-sm small">
+              <p className="m-0">
+                <b>
+                  #
+                  {' '}
+                  {channels.find((ch) => ch.id === currentChannel)?.name}
+                </b>
+              </p>
+              <span className="text-muted">{`${messages.filter((msg) => msg.channelId === currentChannel).length} ${t('chat.messages')}`}</span>
+            </div>
+            <div
+              id="messages-box"
+              ref={messagesBoxRef} // Реф для сообщений
+              onScroll={handleScrollMessages} // Слушаем прокрутку
+              className="chat-messages overflow-auto px-5"
+            >
+              {messages.filter((msg) => msg.channelId === currentChannel).map((message) => (
+                <div key={message.id} className="text-break mb-2">
+                  <strong>
+                    {message.username}
+                    :
+                  </strong>
+                  {` ${message.body}`}
+                </div>
+              ))}
+            </div>
+            <Formik
+              initialValues={{ messageBody: '' }}
+              onSubmit={(values, { resetForm }) => {
+                handleSendMessage(values.messageBody);
+                resetForm();
+              }}
+            >
+              {({ handleSubmit, values }) => (
+                <Form
+                  className="py-1 border rounded-2"
+                  onSubmit={handleSubmit}
+                >
+                  <div className="input-group has-validation">
+                    <Field
+                      name="messageBody"
+                      aria-label="Новое сообщение"
+                      placeholder={t('chat.newMessage')}
+                      className="border-0 p-0 ps-2 form-control"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!values.messageBody.trim()}
+                      className="btn btn-group-vertical"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 16 16"
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"
+                        />
+                      </svg>
+                      <span className="visually-hidden">{t('chat.send')}</span>
+                    </button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
           </div>
-          <Formik initialValues={{ messageBody: '' }} onSubmit={(values, { resetForm }) => { handleSendMessage(values.messageBody); resetForm(); }}>
-            {({ handleSubmit }) => (
-              <Form className="input-group" onSubmit={handleSubmit}>
-                <Field name="messageBody" aria-label="Новое сообщение" placeholder={t('chat.newMessage')} className="form-control" />
-                <button type="submit" className="btn btn-primary">{t('chat.send')}</button>
-              </Form>
-            )}
-          </Formik>
         </div>
       </div>
 

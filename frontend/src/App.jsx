@@ -14,35 +14,37 @@ const App = () => (
   <ErrorBoundary>
     <AuthProvider>
       <Router>
-        <div>
+        <div className="h-100 d-flex flex-column">
           <Header />
-          <Routes>
-            <Route
-              path="/login"
-              element={(
-                <ProtectedRoute redirectTo="/chat" inverse>
-                  <LoginPage />
-                </ProtectedRoute>
-              )}
-            />
-            <Route
-              path="/signup"
-              element={(
-                <ProtectedRoute redirectTo="/chat" inverse>
-                  <SignupPage />
-                </ProtectedRoute>
-              )}
-            />
-            <Route
-              path="/chat"
-              element={(
-                <ProtectedRoute redirectTo="/login">
-                  <ChatPage />
-                </ProtectedRoute>
-              )}
-            />
-            <Route path="/" element={<Navigate to="/login" replace />} />
-          </Routes>
+          <div className="container h-100 my-4 overflow-hidden rounded shadow">
+            <Routes>
+              <Route
+                path="/login"
+                element={(
+                  <ProtectedRoute redirectTo="/chat" inverse>
+                    <LoginPage />
+                  </ProtectedRoute>
+                )}
+              />
+              <Route
+                path="/signup"
+                element={(
+                  <ProtectedRoute redirectTo="/chat" inverse>
+                    <SignupPage />
+                  </ProtectedRoute>
+                )}
+              />
+              <Route
+                path="/chat"
+                element={(
+                  <ProtectedRoute redirectTo="/login">
+                    <ChatPage />
+                  </ProtectedRoute>
+                )}
+              />
+              <Route path="/" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </div>
         </div>
       </Router>
     </AuthProvider>

@@ -50,89 +50,95 @@ const SignupPage = () => {
   });
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
-      <div
-        className="p-4 bg-light rounded shadow"
-        style={{ maxWidth: '400px', width: '100%' }}
-      >
-        <h2>Регистрация в Hexlet Chat</h2>
+    <div className="h-100 d-flex align-items-center justify-content-center bg-light">
+      <div className="container-fluid h-100">
+        <div className="row justify-content-center align-content-center h-100">
+          <div className="col-12 col-md-8 col-xxl-6">
+            <div className="card shadow-sm">
+              <div className="card-body d-flex flex-column flex-md-row justify-content-around align-items-center p-5">
+                <div>
+                  <img
+                    src="./src/assets/registration.jpg"
+                    className="rounded-circle"
+                    alt="Регистрация"
+                  />
+                </div>
+                <Formik
+                  initialValues={{ username: '', password: '', confirmPassword: '' }}
+                  validationSchema={validationSchema}
+                  onSubmit={handleSignup}
+                >
+                  {({ errors, touched }) => (
+                    <Form className="w-50">
+                      <h1 className="text-center mb-4">Регистрация</h1>
 
-        <Formik
-          initialValues={{ username: '', password: '', confirmPassword: '' }}
-          validationSchema={validationSchema}
-          onSubmit={handleSignup}
-        >
-          {({ errors, touched }) => (
-            <Form>
-              {/* Username Field */}
-              <div className="form-floating mb-3 position-relative">
-                <label htmlFor="username" className="form-label">
-                  Имя пользователя
-                </label>
-                <Field
-                  name="username"
-                  id="username"
-                  autoComplete="username"
-                  placeholder="От 3 до 20 символов"
-                  className={`form-control ${
-                    touched.username && errors.username ? 'is-invalid' : ''
-                  }`}
-                />
-                {touched.username && errors.username && (
-                  <div className="invalid-tooltip">{errors.username}</div>
-                )}
+                      {/* Username Field */}
+                      <div className="form-floating mb-3 position-relative">
+                        <Field
+                          name="username"
+                          id="username"
+                          autoComplete="username"
+                          placeholder="От 3 до 20 символов"
+                          className={`form-control ${
+                            touched.username && errors.username ? 'is-invalid' : ''
+                          }`}
+                        />
+                        <label htmlFor="username">Имя пользователя</label>
+                        {touched.username && errors.username && (
+                          <div className="invalid-tooltip">{errors.username}</div>
+                        )}
+                      </div>
+
+                      {/* Password Field */}
+                      <div className="form-floating mb-3 position-relative">
+                        <Field
+                          name="password"
+                          id="password"
+                          type="password"
+                          autoComplete="new-password"
+                          placeholder="Не менее 6 символов"
+                          className={`form-control ${
+                            touched.password && errors.password ? 'is-invalid' : ''
+                          }`}
+                        />
+                        <label htmlFor="password">Пароль</label>
+                        {touched.password && errors.password && (
+                          <div className="invalid-tooltip">{errors.password}</div>
+                        )}
+                      </div>
+
+                      {/* Confirm Password Field */}
+                      <div className="form-floating mb-4 position-relative">
+                        <Field
+                          name="confirmPassword"
+                          id="confirmPassword"
+                          type="password"
+                          autoComplete="new-password"
+                          placeholder="Пароли должны совпадать"
+                          className={`form-control ${
+                            touched.confirmPassword && errors.confirmPassword
+                              ? 'is-invalid'
+                              : ''
+                          }`}
+                        />
+                        <label htmlFor="confirmPassword">Подтвердите пароль</label>
+                        {touched.confirmPassword && errors.confirmPassword && (
+                          <div className="invalid-tooltip">
+                            {errors.confirmPassword}
+                          </div>
+                        )}
+                      </div>
+
+                      <button type="submit" className="btn btn-outline-primary w-100">
+                        Зарегистрироваться
+                      </button>
+                    </Form>
+                  )}
+                </Formik>
               </div>
-
-              {/* Password Field */}
-              <div className="form-floating mb-3 position-relative">
-                <Field
-                  name="password"
-                  id="password"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="Не менее 6 символов"
-                  className={`form-control ${
-                    touched.password && errors.password ? 'is-invalid' : ''
-                  }`}
-                />
-                <label htmlFor="password" className="form-label">
-                  Пароль
-                </label>
-                {touched.password && errors.password && (
-                  <div className="invalid-tooltip">{errors.password}</div>
-                )}
-              </div>
-
-              {/* Confirm Password Field */}
-              <div className="form-floating mb-4 position-relative">
-                <Field
-                  name="confirmPassword"
-                  id="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="Пароли должны совпадать"
-                  className={`form-control ${
-                    touched.confirmPassword && errors.confirmPassword
-                      ? 'is-invalid'
-                      : ''
-                  }`}
-                />
-                <label htmlFor="confirmPassword" className="form-label">
-                  Подтвердите пароль
-                </label>
-                {touched.confirmPassword && errors.confirmPassword && (
-                  <div className="invalid-tooltip">
-                    {errors.confirmPassword}
-                  </div>
-                )}
-              </div>
-
-              <button type="submit" className="btn btn-success w-100 mt-2">
-                Зарегистрироваться
-              </button>
-            </Form>
-          )}
-        </Formik>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,3 +1,19 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+#root {
+  height: 100%;  /* Устанавливаем 100% высоты для root */
+  display: flex; /* Для управления размещением элементов внутри */
+  flex-direction: column; /* Чтобы элементы располагались вертикально */
+}
+
+.container {
+  height: 100%;
+}
+
 /* Общие стили для кнопок */
 .nav-item .btn {
   background-color: white !important; /* Полностью белый фон */
@@ -38,4 +54,10 @@
 .custom-dropdown .dropdown-item:focus {
   background-color: #f8f9fa !important; /* Светло-серый фон при наведении */
   color: black !important; /* Черный текст */
+}
+
+.chat-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: calc(100% - 10rem); /* Убедитесь, что высота корректна */
 }
