@@ -219,7 +219,7 @@ const ChatPage = () => {
 
   return (
     <div className="container h-100 overflow-hidden">
-      <ToastContainer position="top-right" autoClose={300} />
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="row h-100 bg-white flex-md-row">
         {/* Left side - Channel list */}
         <div className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
