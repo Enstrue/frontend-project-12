@@ -76,14 +76,14 @@ const SignupPage = () => {
                       <div className="form-floating mb-3 position-relative">
                         <Field
                           name="username"
-                          id="username"
+                          id="usernameField"
                           autoComplete="username"
                           placeholder="От 3 до 20 символов"
                           className={`form-control ${
                             touched.username && errors.username ? 'is-invalid' : ''
                           }`}
                         />
-                        <label htmlFor="username">Имя пользователя</label>
+                        <label htmlFor="usernameField">Имя пользователя</label>
                         {touched.username && errors.username && (
                           <div className="invalid-tooltip">{errors.username}</div>
                         )}
@@ -93,7 +93,7 @@ const SignupPage = () => {
                       <div className="form-floating mb-3 position-relative">
                         <Field
                           name="password"
-                          id="password"
+                          id="passwordField"
                           type="password"
                           autoComplete="new-password"
                           placeholder="Не менее 6 символов"
@@ -101,7 +101,7 @@ const SignupPage = () => {
                             touched.password && errors.password ? 'is-invalid' : ''
                           }`}
                         />
-                        <label htmlFor="password">Пароль</label>
+                        <label htmlFor="passwordField">Пароль</label>
                         {touched.password && errors.password && (
                           <div className="invalid-tooltip">{errors.password}</div>
                         )}
@@ -111,7 +111,7 @@ const SignupPage = () => {
                       <div className="form-floating mb-4 position-relative">
                         <Field
                           name="confirmPassword"
-                          id="confirmPassword"
+                          id="confirmPasswordField"
                           type="password"
                           autoComplete="new-password"
                           placeholder="Пароли должны совпадать"
@@ -121,7 +121,7 @@ const SignupPage = () => {
                               : ''
                           }`}
                         />
-                        <label htmlFor="confirmPassword">Подтвердите пароль</label>
+                        <label htmlFor="confirmPasswordField">Подтвердите пароль</label>
                         {touched.confirmPassword && errors.confirmPassword && (
                           <div className="invalid-tooltip">
                             {errors.confirmPassword}

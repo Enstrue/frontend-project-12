@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import apiClient from '../api/client';
-import socket from '../api/socket';
+import apiClient from '../api/client.js';
 
 // Асинхронные действия
 export const fetchChatData = createAsyncThunk('chat/fetchData', async () => {
@@ -22,7 +21,7 @@ export const fetchChatData = createAsyncThunk('chat/fetchData', async () => {
       messages: messagesResponse.data,
     };
   } catch (err) {
-    throw new Error('Failed to fetch chat data:', err);
+    throw new Error(`Failed to fetch chat data: ${err.message}`);
   }
 });
 
@@ -34,7 +33,6 @@ export const sendMessage = createAsyncThunk('chat/sendMessage', async ({ channel
     { headers: { Authorization: `Bearer ${token}` } },
   );
 
-  socket.emit('sendMessage', { channelId, body, username });
   return response.data;
 });
 
@@ -46,8 +44,6 @@ export const addNewChannel = createAsyncThunk('chat/addChannel', async (name) =>
     { headers: { Authorization: `Bearer ${token}` } },
   );
 
-  socket.emit('createChannel', { name });
-
   return response.data;
 });
 
@@ -56,8 +52,6 @@ export const removeExistingChannel = createAsyncThunk('chat/removeChannel', asyn
   const response = await apiClient.delete(`/api/v1/channels/${channelId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-
-  socket.emit('removeChannel', { channelId });
 
   return response.data;
 });
@@ -69,8 +63,6 @@ export const renameExistingChannel = createAsyncThunk('chat/renameChannel', asyn
     { name },
     { headers: { Authorization: `Bearer ${token}` } },
   );
-
-  socket.emit('renameChannel', { id, name });
 
   return response.data;
 });
@@ -138,7 +130,42 @@ const chatSlice = createSlice({
         ...state,
         status: 'failed',
         error: action.error.message,
-      }));
+      }))
+      // Добавление подписок через сокеты в редакс
+      .addCase('chat/socket/newMessage', (state, action) => ({
+        // Добавление нового сообщения через сокет
+        ...state,
+        messages: [...state.messages, action.payload],
+      }))
+      .addCase('chat/socket/newChannel', (state, action) => ({
+        // Добавление нового канала через сокет
+        ...state,
+        channels: [...state.channels, action.payload],
+      }))
+      .addCase('chat/socket/removeChannel', (state, action) => ({
+        // Удаление канала через сокет
+        ...state,
+        channels: state.channels.filter(
+          (channel) => channel.id !== action.payload.id,
+        ),
+        messages: state.messages.filter(
+          (msg) => msg.channelId !== action.payload.id,
+        ),
+      }))
+      .addCase('chat/socket/renameChannel', (state, action) => {
+        const index = state.channels.findIndex(
+          (channel) => channel.id === action.payload.id,
+        );
+        if (index !== -1) {
+          const updatedChannels = [...state.channels]; // Создаем новый массив
+          updatedChannels[index] = action.payload;
+          return {
+            ...state,
+            channels: updatedChannels, // Обновляем каналы с новым массивом
+          };
+        }
+        return state;
+      });
   },
 });
 

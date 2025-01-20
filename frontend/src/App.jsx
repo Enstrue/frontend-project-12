@@ -12,8 +12,8 @@ import ErrorBoundary from './ErrorBoundary';
 
 const App = () => (
   <ErrorBoundary>
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <div className="h-100 d-flex flex-column">
           <Header />
           <div className="container h-100 my-4 overflow-hidden rounded shadow">
@@ -46,15 +46,15 @@ const App = () => (
             </Routes>
           </div>
         </div>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   </ErrorBoundary>
 );
 
 const Header = () => {
   const { logout, isAuthenticated } = useAuth();
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+    <nav className="shadow-sm navbar navbar-expand-lg navbar-light bg-white">
       <div className="container">
         <a className="navbar-brand" href="/">
           Hexlet Chat

@@ -1,11 +1,21 @@
-import { useEffect, useState, useRef } from 'react';
+import {
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import leoProfanity from 'leo-profanity';
-import { Modal, Button, Dropdown, Spinner } from 'react-bootstrap';
+import {
+  Modal,
+  Button,
+  Dropdown,
+  Spinner,
+} from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import {
@@ -46,6 +56,7 @@ const ChatPage = () => {
   const lastScrollTopMessages = useRef(0); // Для сообщений
   const lastScrollTopChannels = useRef({}); // Для каналов
 
+  const messageCount = messages.filter((msg) => msg.channelId === currentChannel).length;
   // Обработчик прокрутки для сообщений
   const handleScrollMessages = () => {
     if (messagesBoxRef.current) {
@@ -65,20 +76,24 @@ const ChatPage = () => {
     }
   };
 
+  const memoizedChannels = useMemo(() => channels, [channels]);
+
   useEffect(() => {
     leoProfanity.loadDictionary('ru');
     leoProfanity.loadDictionary('en');
-    dispatch(fetchChatData())
-      .then(() => {
-        if (channels.length > 0 && isInitialRender.current) {
-          setCurrentChannel(channels.find((channel) => channel.name === 'general')?.id || defaultChannelId);
-          isInitialRender.current = false;
-        }
-      })
-      .catch(() => {
-        toast.error(t('chat.notifications.fetchError'));
-      });
-  }, [dispatch, t, channels, defaultChannelId]);
+    if (isInitialRender.current) {
+      dispatch(fetchChatData())
+        .then(() => {
+          if (memoizedChannels.length > 0 && isInitialRender.current) {
+            setCurrentChannel(memoizedChannels.find((channel) => channel.name === 'general')?.id || defaultChannelId);
+            isInitialRender.current = false;
+          }
+        })
+        .catch(() => {
+          toast.error(t('chat.notifications.fetchError'));
+        });
+    }
+  }, [dispatch, t, defaultChannelId, memoizedChannels]);
 
   useEffect(() => {
     // Прокручиваем в самый низ, если пользователь не прокручивает вручную (для сообщений)
@@ -193,14 +208,14 @@ const ChatPage = () => {
       .test('unique', t('validation.unique'), (value) => !channels.some((channel) => channel.name === value)),
   });
 
-  // // Если статус "loading", отображаем спиннер
-  // if (status === 'loading') {
-  //   return (
-  //     <div className="d-flex justify-content-center align-items-center w-100 h-100">
-  //       <Spinner animation="border" variant="primary" />
-  //     </div>
-  //   );
-  // }
+  // Если статус "loading", отображаем спиннер
+  if (status === 'loading') {
+    return (
+      <div className="d-flex justify-content-center align-items-center w-100 h-100">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="container h-100 overflow-hidden">
@@ -314,7 +329,7 @@ const ChatPage = () => {
                   {channels.find((ch) => ch.id === currentChannel)?.name}
                 </b>
               </p>
-              <span className="text-muted">{`${messages.filter((msg) => msg.channelId === currentChannel).length} ${t('chat.messages')}`}</span>
+              <span className="text-muted">{`${t('chat.messages', { count: messageCount })}`}</span>
             </div>
             <div
               id="messages-box"

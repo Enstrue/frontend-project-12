@@ -45,6 +45,9 @@ const resources = {
         cancel: 'Отмена',
         delete: 'Удалить',
         send: 'Отправить',
+        messages: '{{count}} сообщение',
+        messages_plural: '{{count}} сообщения',
+        messages_many: '{{count}} сообщений',
         notifications: {
           networkError: 'Ошибка сети. Проверьте подключение.',
           fetchError: 'Ошибка загрузки данных.',
@@ -79,6 +82,7 @@ i18n
     interpolation: {
       escapeValue: false, // React сам защищает от XSS
     },
+    pluralSeparator: '_',
   });
 
 export default i18n;
