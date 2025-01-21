@@ -8,26 +8,26 @@ const socket = io('http://localhost:5002', {
   },
 });
 
-const initializeSocket = (store) => {
+const initializeSocket = ({ dispatch }) => {
   // Подписка на события
   socket.on('newMessage', (payload) => {
     console.log('Новое сообщение:', payload);
-    store.dispatch({ type: 'chat/socket/newMessage', payload });
+    dispatch({ type: 'chat/socket/newMessage', payload });
   });
 
   socket.on('newChannel', (payload) => {
     console.log('Новый канал:', payload);
-    store.dispatch({ type: 'chat/socket/newChannel', payload });
+    dispatch({ type: 'chat/socket/newChannel', payload });
   });
 
   socket.on('removeChannel', (payload) => {
     console.log('Удален канал:', payload);
-    store.dispatch({ type: 'chat/socket/removeChannel', payload });
+    dispatch({ type: 'chat/socket/removeChannel', payload });
   });
 
   socket.on('renameChannel', (payload) => {
     console.log('Переименован канал:', payload);
-    store.dispatch({ type: 'chat/socket/renameChannel', payload });
+    dispatch({ type: 'chat/socket/renameChannel', payload });
   });
 };
 
