@@ -402,8 +402,8 @@ const ChatPage = () => {
                 <Modal.Title>{t('chat.addChannel')}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                <label htmlFor="name" className="visually-hidden">
-                  Имя канала
+                <label htmlFor="name" className="form-label visually-hidden">
+                  {t('chat.channelName')}
                 </label>
                 <Field
                   name="name"
@@ -453,8 +453,8 @@ const ChatPage = () => {
                     'is-valid': touched.name && !errors.name,
                   })}
                 />
-                <label htmlFor="name" className="visually-hidden">
-                  Имя канала
+                <label htmlFor="name" className="form-label">
+                  {t('chat.channelName')}
                 </label>
                 {touched.name && errors.name && <div className="invalid-feedback">{errors.name}</div>}
               </Modal.Body>

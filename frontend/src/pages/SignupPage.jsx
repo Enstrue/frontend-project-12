@@ -75,15 +75,14 @@ const SignupPage = () => {
                       {/* Username Field */}
                       <div className="form-floating mb-3 position-relative">
                         <Field
+                          id="username"
                           name="username"
-                          id="usernameField"
-                          autoComplete="username"
-                          placeholder="От 3 до 20 символов"
                           className={`form-control ${
                             touched.username && errors.username ? 'is-invalid' : ''
                           }`}
+                          required
                         />
-                        <label htmlFor="usernameField">Имя пользователя</label>
+                        <label htmlFor="username">{t('signup.username')}</label>
                         {touched.username && errors.username && (
                           <div className="invalid-tooltip">{errors.username}</div>
                         )}
@@ -101,7 +100,7 @@ const SignupPage = () => {
                             touched.password && errors.password ? 'is-invalid' : ''
                           }`}
                         />
-                        <label htmlFor="passwordField">Пароль</label>
+                        <label htmlFor="passwordField">{t('signup.password')}</label>
                         {touched.password && errors.password && (
                           <div className="invalid-tooltip">{errors.password}</div>
                         )}
@@ -121,7 +120,7 @@ const SignupPage = () => {
                               : ''
                           }`}
                         />
-                        <label htmlFor="confirmPasswordField">Подтвердите пароль</label>
+                        <label htmlFor="confirmPasswordField">{t('signup.confirmPassword')}</label>
                         {touched.confirmPassword && errors.confirmPassword && (
                           <div className="invalid-tooltip">
                             {errors.confirmPassword}

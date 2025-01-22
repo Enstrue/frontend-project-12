@@ -37,6 +37,7 @@ const resources = {
         actions: 'Действия',
         channels: 'Каналы',
         chatIn: 'Чат в',
+        channelName: 'Имя канала',
         newMessage: 'Введите сообщение...',
         addChannel: 'Добавить канал',
         renameChannel: 'Переименовать канал',
