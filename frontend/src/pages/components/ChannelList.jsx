@@ -61,7 +61,9 @@ const ChannelList = ({
                     split
                     variant={isActive ? 'secondary' : 'light'}
                     id={`dropdown-split-${channel.id}`}
-                  />
+                  >
+                    <span className="visually-hidden">Управление каналом</span>
+                  </Dropdown.Toggle>
                   <Dropdown.Menu>
                     <Dropdown.Item onClick={() => { setModalType('rename'); setSelectedChannel(channel); }}>
                       {t('chat.renameChannel')}
