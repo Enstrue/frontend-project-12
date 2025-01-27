@@ -118,7 +118,7 @@ const ChatPage = () => {
   useEffect(() => {
     dispatch(fetchChatData());
     setCurrentChannel(defaultChannelId);
-  }, [dispatch]);
+  }, [defaultChannelId, dispatch]);
 
   useEffect(() => {
     if (messageEndRef.current) {
