@@ -6,6 +6,7 @@ import {
   Navigate,
 } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './contexts/AuthCont';
 import LoginPage from './pages/LoginPage';
 import ChatPage from './pages/ChatPage';
@@ -17,7 +18,6 @@ const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Инициализация сокета при монтировании компонента App
     initializeSocket({ dispatch });
   }, [dispatch]);
 
@@ -65,11 +65,12 @@ const App = () => {
 
 const Header = () => {
   const { logout, isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   return (
     <nav className="shadow-sm navbar navbar-expand-lg navbar-light bg-white">
       <div className="container">
         <a className="navbar-brand" href="/">
-          Hexlet Chat
+          {t('header.brand')}
         </a>
         {isAuthenticated && (
           <button
@@ -77,7 +78,7 @@ const Header = () => {
             className="btn btn-outline-danger ml-auto"
             onClick={logout}
           >
-            Выйти
+            {t('header.logout')}
           </button>
         )}
       </div>

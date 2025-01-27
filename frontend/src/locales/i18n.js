@@ -70,6 +70,10 @@ const resources = {
       notFound: {
         message: '404: Страница не найдена',
       },
+      errorBoundary: {
+        wrong: 'Something went wrong:',
+        try: 'Try again',
+      },
     },
   },
 };
