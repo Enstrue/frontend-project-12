@@ -21,8 +21,8 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Токен невалиден, перенаправляем на страницу авторизации
+    if (error.response && error.response.status === 401 && window.location.pathname !== '/login') {
+      // Токен невалиден и мы не на странице входа, перенаправляем на страницу авторизации
       localStorage.removeItem('token');
       window.location.href = '/login'; // Замените на вашу страницу авторизации
     }
