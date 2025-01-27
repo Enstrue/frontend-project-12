@@ -74,6 +74,10 @@ const resources = {
         wrong: 'Something went wrong:',
         try: 'Try again',
       },
+      hidden: {
+        add: '+',
+        control: 'Управление каналом',
+      },
     },
   },
 };

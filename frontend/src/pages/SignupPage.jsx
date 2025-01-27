@@ -70,7 +70,7 @@ const SignupPage = () => {
                 >
                   {({ errors, touched }) => (
                     <Form className="w-50">
-                      <h1 className="text-center mb-4">Регистрация</h1>
+                      <h1 className="text-center mb-4">{t('login.signup')}</h1>
 
                       {/* Username Field */}
                       <div className="form-floating mb-3 position-relative">
@@ -129,7 +129,7 @@ const SignupPage = () => {
                       </div>
 
                       <button type="submit" className="btn btn-outline-primary w-100">
-                        Зарегистрироваться
+                        {t('signup.signup')}
                       </button>
                     </Form>
                   )}
